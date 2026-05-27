@@ -1,0 +1,11 @@
+{
+  "dockerfile_lines": [],
+  "graphs": {
+    "triage_router": "workflow:app"
+  },
+  "python_version": "3.11",
+  "env": ".env",
+  "dependencies": [
+    "."
+  ]
+}

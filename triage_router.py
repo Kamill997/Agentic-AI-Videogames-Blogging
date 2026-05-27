@@ -1,6 +1,5 @@
 import os
 from typing import Literal
-from pydantic import BaseModel, Field
 from langchain.chat_models import init_chat_model
 from langgraph.types import Command
 from dotenv import load_dotenv
@@ -10,19 +9,18 @@ from prompts.prompts import (
     default_background, 
     triage_user_prompt
 )
-from schema import ContentRouterSchema, State
+from schema import ContentRouterSchema, AgentState
 
 load_dotenv() 
 if not os.environ.get("GROQ_API_KEY"):
     print("Attenzione: GROQ_API_KEY non trovata nel file .env!")
 
-
 llm = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
 llm_router = llm.with_structured_output(ContentRouterSchema) 
 
-def triage_router(state: State) -> Command[Literal["agent", "__end__"]]:
+def triage_router(state: AgentState) -> Command[Literal["clarify_with_user", "llm_call"]]:
     """Analyze the request content to decide the appropriate topic."""
-    blog_request = state["Request"]
+    blog_request = state["messages"]
     
     system_prompt = triage_system_prompt.format(
         background=default_background,
@@ -38,40 +36,26 @@ def triage_router(state: State) -> Command[Literal["agent", "__end__"]]:
         {"role": "user", "content": user_prompt},
     ])
 
-    if result.classification == "News":
-        print(f"Classification: NEWS - Processing gaming updates or announcements")
-        goto = "agent"
+    if result.classification == "Review":
+        goto = "clarify_with_user"
         update = {
-            "messages": [{"role": "user", "content": f"Handle this gaming News request: \n\n{blog_request}"}],
+            "messages": [{"role": "user", "content": f"Richiesta di recensione: {blog_request}"}],
             "classification_decision": result.classification,
-        }
-    elif result.classification == "Review":
-        print(f"Classification: REVIEW - Processing game or hardware evaluation")
-        goto = "agent"
-        update = {
-            "messages": [{"role": "user", "content": f"Handle this gaming Review request: \n\n{blog_request}"}],
-            "classification_decision": result.classification,
+            "reasoning_classification": result.reasoning,
         }
     elif result.classification == "Guide":
-        print(f"Classification: GUIDE - Processing gameplay help or puzzle solution")
-        goto = "agent"
+        goto = "clarify_with_user"
         update = {
-            "messages": [{"role": "user", "content": f"Handle this gaming Guide request: \n\n{blog_request}"}],
+            "messages": [{"role": "user", "content": f"Richiesta di guida: {blog_request}"}],
             "classification_decision": result.classification,
+            "reasoning_classification": result.reasoning,
         }
-    elif result.classification == "Event":
-        print(f"Classification: EVENT - Processing calendar items, showcase or tournament coverage")
-        goto = "agent"
+    elif result.classification == "Suggestion":
+        goto = "llm_call"
         update = {
-            "messages": [{"role": "user", "content": f"Handle this gaming Event request: \n\n{blog_request}"}],
+            "messages": [{"role": "user", "content": f"Richiesta di suggerimento: {blog_request}"}],
             "classification_decision": result.classification,
-        }
-    elif result.classification == "Advice":
-        print(f"Classification: ADVICE - Processing brainstorming or content ideas")
-        goto = "agent"
-        update = {
-            "messages": [{"role": "user", "content": f"Handle this gaming Advice request: \n\n{blog_request}"}],
-            "classification_decision": result.classification,
+            "reasoning_classification": result.reasoning,
         }
     else:
         raise ValueError(f"Invalid classification: {result.classification}")

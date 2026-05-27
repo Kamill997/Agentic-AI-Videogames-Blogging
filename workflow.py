@@ -1,25 +1,18 @@
 from langgraph.graph import StateGraph, START, END
-from schema import State
 from triage_router import triage_router
+from schema import AgentState, AgentInputState
+from clarification_user import clarify_with_user, write_research_brief
+from llm_call import llm_call
+from langchain_core.messages import HumanMessage
 
-workflow = StateGraph(State)
-def agent_node(state: State) -> dict:
-    # Non fa assolutamente nulla e lascia passare il flusso
-    return {}
+workflow = StateGraph(AgentState, input_schema=AgentInputState)
 
 workflow.add_node("triage_router", triage_router)
-workflow.add_node("agent", agent_node)
-
+workflow.add_node("clarify_with_user", clarify_with_user)
+workflow.add_node("llm_call", llm_call)
+workflow.add_node("write_research_brief", write_research_brief)
 workflow.add_edge(START, "triage_router")
-workflow.add_edge("agent", END)
 
+workflow.add_edge("write_research_brief", "llm_call")
+workflow.add_edge("llm_call", END)
 app = workflow.compile()
-
-if __name__ == "__main__":
-    input_test = {
-        "Request": "Puoi scrivermi una guida passo passo su come battere il primo boss su elden ring?",
-        "messages": []
-    }
-    stato_finale = app.invoke(input_test)
-    print(f"Decisione del Router: {stato_finale.get('classification_decision')}")
-    print(f"Risposta finale: {stato_finale['messages'][-1].content}")
