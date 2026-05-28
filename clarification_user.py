@@ -1,19 +1,11 @@
-from langgraph.graph import END
 from schema import AgentState, ClarifyWithUser, ResearchQuestion
 from prompts.prompt_chiarificazione_richiesta_utente import clarify_guide_instructions,clarify_review_instructions,transform_messages_into_research_topic_prompt
 from langchain_core.messages import HumanMessage, AIMessage, get_buffer_string
-from dotenv import load_dotenv
-from langchain.chat_models import init_chat_model
-import os
 from langgraph.types import Command
 from typing import Literal
 from langgraph.types import interrupt, Command
+from schema import llm
 
-load_dotenv() 
-if not os.environ.get("GROQ_API_KEY"):
-    print("Attenzione: GROQ_API_KEY non trovata nel file .env!")
-
-llm = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
 
 
 def clarify_with_user(state: AgentState) -> Command[Literal["clarify_with_user", "write_research_brief"]]:

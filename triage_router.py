@@ -1,24 +1,18 @@
-import os
 from typing import Literal
-from langchain.chat_models import init_chat_model
 from langgraph.types import Command
-from dotenv import load_dotenv
-from prompts.prompts import (
+from prompts.prompt_triage import (
     triage_system_prompt, 
     default_triage_instructions, 
     default_background, 
     triage_user_prompt
 )
 from schema import ContentRouterSchema, AgentState
+from schema import llm
+from langgraph.graph import StateGraph, START, END
 
-load_dotenv() 
-if not os.environ.get("GROQ_API_KEY"):
-    print("Attenzione: GROQ_API_KEY non trovata nel file .env!")
-
-llm = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
 llm_router = llm.with_structured_output(ContentRouterSchema) 
 
-def triage_router(state: AgentState) -> Command[Literal["clarify_with_user", "llm_call"]]:
+def triage_router(state: AgentState) -> Command[Literal["clarify_with_user", "llm_call", END]]:
     """Analyze the request content to decide the appropriate topic."""
     blog_request = state["messages"]
     
@@ -57,6 +51,9 @@ def triage_router(state: AgentState) -> Command[Literal["clarify_with_user", "ll
             "classification_decision": result.classification,
             "reasoning_classification": result.reasoning,
         }
+    elif result.classification == "Ignore":
+        goto = END
+        update= {"Richiesta non pertinente ai videogiochi, classificata come 'Ignore'. Nessuna azione ulteriore intrapresa."}
     else:
         raise ValueError(f"Invalid classification: {result.classification}")
         

@@ -13,7 +13,7 @@ Il sistema genera SOLO recensioni e analisi di videogiochi o hardware. Le rispos
 REGOLE PER APPROVARE (need_clarification=false):
 - È indicato esattamente il titolo specifico del gioco (non la serie generica).
 - L'input è chiaro, anche se non specifica la piattaforma.
-Esempi: "recensione Elden Ring", "recensione Assassin's Creed Valhalla","Recensione fear3", "recensione sekiro per pc", "recensione God of War 4 ps4".
+Esempi: "recensione Elden Ring", "recensione Assassin's Creed Valhalla","Recensione fear3", "recensione sekiro per pc", "recensione God of War 4 ps4", "Recensione batman arkham knight"
 
 REGOLE PER CHIEDERE CHIARIMENTI (need_clarification=true):
 - Viene indicata una serie generica e non il capitolo specifico.
