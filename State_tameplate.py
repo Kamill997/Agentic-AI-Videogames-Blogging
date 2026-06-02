@@ -6,21 +6,24 @@ from langchain.chat_models import init_chat_model
 from typing_extensions import Optional, Annotated, Sequence
 from langchain_core.messages import BaseMessage
 from langgraph.graph import MessagesState
-from langgraph.graph.message import add_messages
+from langgraph.graph.message import Any, add_messages
 from pydantic import BaseModel, Field
 import os
 from tavily import TavilyClient
 import operator
 
+
 load_dotenv() 
-if not os.environ.get("GROQ_API_KEY"):
-    print("Attenzione: GROQ_API_KEY non trovata nel file .env!")
+if not os.environ.get("OPENAI_API_KEY"):
+    print("Attenzione: OPENAI_API_KEY non trovata nel file .env!")
 if not os.environ.get("TAVILY_API_KEY"):
     print("Attenzione: TAVILY_API_KEY non trovata nel file .env!")
 
 llm = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
+#llm_p = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
+llm_p = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
+#llm = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
 tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
-
 
 class AgentInputState(MessagesState):
     """Input state for the full agent - only contains messages from user input."""
@@ -34,24 +37,12 @@ class AgentState(MessagesState):
     Note: Some fields are duplicated across different state classes for proper
     state management between subgraphs and the main workflow.
     """
-    Request: str
-    classification_decision: Literal["Review", "Guide", "Suggestion"]
-    reasoning_classification: Optional[str]
-    research_brief: Optional[str]
-    researcher_messages: list[BaseMessage]
-    # Messages exchanged with the supervisor agent for coordination
-    supervisor_messages: Annotated[Sequence[BaseMessage], add_messages]
-    # Raw unprocessed research notes collected during the research phase
-    #raw_notes: Annotated[list[str], operator.add] = []
-    # Processed and structured notes ready for report generation
-    # Final formatted research report
-    #final_report: str
+    Request: str  #Richiesta iniziale
+    classification_decision: Literal["Review", "News", "Suggestion"] #classificazione
+    reasoning_classification: Optional[str] #Motivazione della classificazione
+    research_brief: Optional[str] #Query dopo chiarificazione
+    compose_res: str #Risultato finale
 
-load_dotenv() 
-if not os.environ.get("GROQ_API_KEY"):
-    print("Attenzione: GROQ_API_KEY non trovata nel file .env!")
-
-llm = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
 
 class ContentRouterSchema(BaseModel):
     """Classifies and routes user requests based on intent."""
@@ -60,13 +51,13 @@ class ContentRouterSchema(BaseModel):
         description="Short justification for the classification."
     )
 
-    classification: Literal["Review", "Guide", "Suggestion", "Ignore"] = Field(
+    classification: Literal["Review", "News", "Suggestion", "Ignore"] = Field(
     description=(
             "The classification of the request content: "
             "'Review' for detailed evaluations, scores, opinions, or pros/cons about video games or hardware; "
-            "'Guide' for functional step-by-step instructions, walkthroughs, gameplay help, puzzles, or unlock mechanics; "
+            "'News' for current events, updates, or announcements related to video games; "
             "'Suggestion' for creative brainstorming, future topic ideas, editorials, or strategic content guidance."
-            "Ignore' for requests that do notdirectly pertain to the world of video games, which should be deprioritized and not processed further."    
+            "'Ignore' for requests that do notdirectly pertain to the world of video games, which should be deprioritized and not processed further."    
         ),
     )
 
@@ -78,9 +69,7 @@ class ClarifyWithUser(BaseModel):
     question: str = Field(
         description="A question to ask the user to clarify the report scope",
     )
-    verification: str = Field(
-        description="Verify message that we will start research after the user has provided the necessary information.",
-    )
+
 
 class ResearchQuestion(BaseModel):
     """Schema for structured research brief generation."""

@@ -6,11 +6,11 @@ from prompts.prompt_triage import (
     default_background, 
     triage_user_prompt
 )
-from schema import ContentRouterSchema, AgentState
-from schema import llm
+from State_tameplate import ContentRouterSchema, AgentState
+from State_tameplate import llm_p
 from langgraph.graph import StateGraph, START, END
 
-llm_router = llm.with_structured_output(ContentRouterSchema) 
+llm_router = llm_p.with_structured_output(ContentRouterSchema) 
 
 def triage_router(state: AgentState) -> Command[Literal["clarify_with_user", "llm_call", END]]:
     """Analyze the request content to decide the appropriate topic."""
@@ -33,21 +33,21 @@ def triage_router(state: AgentState) -> Command[Literal["clarify_with_user", "ll
     if result.classification == "Review":
         goto = "clarify_with_user"
         update = {
-            "messages": [{"role": "user", "content": f"Richiesta di recensione: {blog_request}"}],
+            #"messages": [{"role": "user", "content": f"Richiesta di recensione: {blog_request}"}],
             "classification_decision": result.classification,
             "reasoning_classification": result.reasoning,
         }
-    elif result.classification == "Guide":
+    elif result.classification == "News":
         goto = "clarify_with_user"
         update = {
-            "messages": [{"role": "user", "content": f"Richiesta di guida: {blog_request}"}],
+            #"messages": [{"role": "user", "content": f"Richiesta di news: {blog_request}"}],
             "classification_decision": result.classification,
             "reasoning_classification": result.reasoning,
         }
     elif result.classification == "Suggestion":
         goto = "llm_call"
         update = {
-            "messages": [{"role": "user", "content": f"Richiesta di suggerimento: {blog_request}"}],
+            #"messages": [{"role": "user", "content": f"Richiesta di suggerimento: {blog_request}"}],
             "classification_decision": result.classification,
             "reasoning_classification": result.reasoning,
         }

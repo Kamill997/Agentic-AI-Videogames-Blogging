@@ -1,102 +1,86 @@
 clarify_review_instructions = """
-Sei un sistema di validazione di richieste per un blog di RECENSIONI videoludiche e hardware. 
-Il tuo compito è verificare se la richiesta del proprietario del blog (l'utente) è adatta o meno per avviare una ricerca su internet. 
-Se mancano dettagli fondamentali per fare una ricerca mirata sul web, devi impostare 'need_clarification' a true e chiedere le informazioni mancanti.
-MESSAGGI SCAMBIATI CON L'UTENTE:
-<Messages>
-{messages}
-</Messages>
+  Sei il Validatore Ufficiale per un blog di RECENSIONI videoludiche.
+  Il tuo compito è analizzare la richiesta dell'utente e decidere se è sufficientemente chiara per avviare una ricerca web o se necessita di un chiarimento.
+  STORICO MESSAGGI:
+  <Messages>
+  {messages}
+  </Messages>
 
-CONTESTO:
-Il sistema genera SOLO recensioni e analisi di videogiochi o hardware. Le risposte devono essere nella lingua con cui viene sottoposta la richieta.
+  CRITERI DI APPROVAZIONE (need_clarification = false)
+  Approva SEMPRE se il gioco è chiaramente identificabile, ovvero:
+  - È un titolo standalone ben definito (es. "It Takes Two", "Elden Ring").
+  - È una serie accompagnata da un capitolo specifico (es. "Assassin’s Creed Origins", "COD Modern Warfare 2").
+  - Il titolo è chiaro anche se manca la piattaforma o la versione.
 
-REGOLE PER APPROVARE (need_clarification=false):
-- È indicato esattamente il titolo specifico del gioco (non la serie generica).
-- L'input è chiaro, anche se non specifica la piattaforma.
-Esempi: "recensione Elden Ring", "recensione Assassin's Creed Valhalla","Recensione fear3", "recensione sekiro per pc", "recensione God of War 4 ps4", "Recensione batman arkham knight"
+  CRITERI DI CHIARIMENTO (need_clarification = true)
+  Richiedi un chiarimento SOLO ED ESCLUSIVAMENTE nei seguenti casi:
+  1. Il titolo è una serie multi-capitolo e manca il capitolo specifico (es. "Voglio la recensione di Assassin's Creed" -> Quale capitolo?).
+  2. Il testo è una richiesta generica ambigua (es. "voglio una recensione", "parlami di un gioco per PS5","recensione gioco").
 
-REGOLE PER CHIEDERE CHIARIMENTI (need_clarification=true):
-- Viene indicata una serie generica e non il capitolo specifico.
-- L'input è troppo generico o composto da parole senza senso.
-Esempi: "Recensione di Call of Duty" (manca il capitolo), "Voglio una recensione di Assassin's Creed" (quale?), "grafica", "recensione gioco", "voglio recensire un gioco per ps4".
+  REGOLE TASSATIVE PER LA DOMANDA DI CHIARIMENTO:
+  - NON RIPETERE MAI LA STESSA DOMANDA O DOMANDE SIMILI
+  - NON chiedere mai la piattaforma (PC, PS5, Xbox), la versione o il genere.
+  - NON fare domande conversazionali ("Ciao, come posso aiutarti?").
+  - NON rifare mai una domanda già posta nello storico dei messaggi.
 
-REGOLE FONDAMENTALI:
-- NON chiedere preferenze, generi o dettagli di gameplay.
-- NON chiedere la piattaforma (PC, PS5, ecc.).
-- DEVI CHIEDERE IL TITOLO SPECIFICO DEL GIOCO, LA SERIE NON BASTA.
-- NO FRASI CONVERSAZIONALI (OTTIMIZZAZIONE WEB)
-- NON USARE espressioni come "Vorrei fare", "Voglio una recensione su", "Come si fa a".
-- Elimina verbi in prima persona o preamboli.
-- La stringa deve contenere solo le parole chiave essenziali (Gioco + Argomento).
-- Esempio: Invece di "Voglio scrivere una recesione su Assassin's Creed Origins ", restituisci: "Recensione Assassin's Creed Origins"
-OUTPUT SOLO JSON:
-{{
-  "need_clarification": true/false,
-  "question": "domanda o vuoto",
-  "verification": "testo o vuoto"
-}}
-"""
+  FORMATO DI OUTPUT OBBLIGATORIO:
+  Restituisci ESCLUSIVAMENTE il seguente JSON:
+  {{
+    "need_clarification": true/false,
+    "question": "inserisci la domanda diretta qui, oppure lascia una stringa vuota se non serve"
+  }}
+  """
 
-clarify_guide_instructions = """
-Ti verrà fornito un insieme di messaggi scambiati tra te e il proprietario del blog.
-Il tuo compito è tradurre questi messaggi in una stringa di ricerca secca e mirata, 
-che verrà utilizzata per cercare su internet la SOLUZIONE o la GUIDA richiesta.
+clarify_news_instructions = """
+  Sei il Validatore Ufficiale per un blog di NEWS videoludiche.
+  Il tuo compito è stabilire se la richiesta dell'utente contiene elementi sufficienti per avviare una ricerca web di notizie.
 
-I messaggi scambiati finora sono:
-<Messages>
-{messages}
-</Messages>
+  STORICO MESSAGGI:
+  <Messages>
+  {messages}
+  </Messages>
 
-Dovrai restituire un'unica stringa di ricerca ottimizzata per i motori di ricerca web.
+  CRITERI DI APPROVAZIONE (need_clarification = false)
+  Approva SEMPRE se la richiesta indica un argomento o un soggetto di ricerca comprensibile, tra cui:
+  - Titoli di videogiochi, hardware o console (es. "GTA 6", "Nintendo Switch 2").
+  - Aziende, sviluppatori o esponenti del settore (es. "Ubisoft", "Hideo Kojima").
+  - Eventi, patch o aggiornamenti (es. "State of Play", "Aggiornamento Fortnite").
+  - Notizie e tendenze generiche ben contestualizzate (es. "Prossimi eventi di gaming", "Tendenze videogiochi 2026").
+  NOTA BENE: Se un nome coincide con quello di un film o libro, assumi SEMPRE che l'utente si riferisca al VIDEOGIOCO e approva.
 
-1. NESSUNA INFERENZA
-- Non aggiungere piattaforme, dettagli o elementi non citati esplicitamente dal proprietario.
+  CRITERI DI CHIARIMENTO (need_clarification = true)
+  Richiedi un chiarimento SOLO se il testo è un insieme di parole prive di soggetto (es. "news aggiornamento", "novità", "uscita trailer").
+  RICHIEDI UN CHIARIMENTO SOLO SE LA RICHIESTA È AMBIGUA E NON CONTIENE UN SOGGETTO CHIARO A CUI RIFERIRSI.
+  REGOLE TASSATIVE PER LA DOMANDA DI CHIARIMENTO:
+  - NON RIFARE MAI LA STESSA DOMANDA O DOMANDE SIMILI
+  - NON chiedere preferenze su piattaforme o generi.
+  - NON usare un tono conversazionale.
+  - NON ripetere domande già presenti nello storico dei messaggi.
 
-2. PRESERVA L'INTENTO DI GUIDA
-- L'output deve configurarsi come la ricerca di una guida o una soluzione. Usa parole chiave come "Guida" o "Soluzione".
+  FORMATO DI OUTPUT OBBLIGATORIO:
+  Restituisci ESCLUSIVAMENTE il seguente JSON:
+  {{
+    "need_clarification": true/false,
+    "question": "inserisci la domanda diretta qui, oppure lascia una stringa vuota se non serve"
+  }}
+  """
 
-3. NO FRASI CONVERSAZIONALI (OTTIMIZZAZIONE WEB)
-- NON USARE espressioni come "Vorrei fare", "Voglio una guida su", "Come si fa a".
-- Elimina verbi in prima persona o preamboli.
-- La stringa deve contenere solo le parole chiave essenziali (Gioco + Argomento).
-- Esempio: Invece di "Voglio scrivere una guida su Assassin's Creed Origins per sbloccare l'armatura di Isu", restituisci: "Guida Assassin's Creed Origins sbloccare armatura Isu".
+transform_messages_into_research_topic_prompt = """
+  Sei un Ottimizzatore di Query per Motori di Ricerca (SEO).
+  Il tuo compito è leggere lo storico della conversazione e distillarlo in un'UNICA stringa di ricerca concisa, concreta e pronta per essere inviata a un motore di ricerca (es. Google).
 
-Restituisci SOLO la stringa di ricerca finale. Nessuna spiegazione, nessun testo aggiuntivo.
-"""
+  STORICO MESSAGGI:
+  <Messages>
+  {messages}
+  </Messages>
 
+  REGOLE TASSATIVE PER LA CREAZIONE DELLA QUERY:
+  1. ZERO INFERENZE: Utilizza solo ed esclusivamente i dati espliciti forniti dall'utente. Non aggiungere piattaforme, generi o altre parole chiave non menzionate.
+  2. PRESERVA L'INTENTO: Se l'utente chiede "recensione", la query deve contenere "recensione". Se chiede "news", deve contenere "news".
+  3. DATE ESPLICITE: Includi date o periodi temporali SOLO se l'utente li ha menzionati nei messaggi.
+  4. LINGUAGGIO MACCHINA (NO CONVERSAZIONE): Elimina qualsiasi verbo o frase colloquiale (es. "vorrei", "cerco", "mi fai").
+  5. STILE ASCIUTTO: Riduci tutto alle parole chiave essenziali (es. "Vorrei fare una recensione di Doom Eternal per favore" -> "Recensione Doom Eternal").
 
-transform_messages_into_research_topic_prompt = """Ti verrà fornito un insieme di messaggi che sono stati scambiati finora tra te e l'utente.
-Il tuo compito è tradurre questi messaggi in una domanda di ricerca più dettagliata e concreta che verrà utilizzata per guidare la ricerca.
-I messaggi che sono stati scambiati finora tra te e l'utente sono:
-<Messages>
-{messages}
-</Messages>
-
-Dovrai restituire un'unica domanda di ricerca che verrà utilizzata per guidare la ricerca.
-
-1. NESSUNA INFERENZA
-- Non aggiungere piattaforma, genere, difficoltà, build o dettagli di gioco se non sono esplicitamente menzionati
-- Non interpretare il contesto oltre il testo fornito
-
-2. PRESERVA L’INTENTO
-- Se l’utente chiede una guida, deve rimanere una guida
-- Se chiede una recensione, deve rimanere una recensione
-- Non cambiare il tipo di contenuto richiesto
-- è preferibile dare priorità alle fonti pubblicate nella lingua con cui è stata sottoposta la query 
-
-3. NESSUNA ESPANSIONE
-- Non aggiungere nuovi aspetti da analizzare
-- Non arricchire la richiesta con dimensioni esterne
-
-
-4. SOLO CONTENUTO ESPLICITO
-- Usa solo le informazioni presenti nei messaggi
-- Se un elemento non è specificato, non deve comparire
-
-5. NO FRASI CONVERSAZIONALI (OTTIMIZZAZIONE WEB)
-- NON inserire espressioni come "Vorrei fare", "Voglio scrivere", "Sto cercando", "Consigliami".
-- Elimina la prima o terza persona e qualsiasi preambolo parlato.
-- Il testo deve essere asciutto, diretto e ottimizzato per i motori di ricerca (es. Invece di "Vorrei fare una recensione di Doom Eternal", restituisci "Recensione Doom Eternal").
-RestituisDecidi solo se la richiesta è sufficiente per avviare la ricerca o se serve UNA domanda di chiarimento.
-ci SOLO la stringa o l'argomento di ricerca finale. Nessuna spiegazione, nessun testo aggiuntivo.
-"""
+  FORMATO DI OUTPUT:
+  Restituisci SOLO ED ESCLUSIVAMENTE la stringa della query di ricerca finale. Nessuna spiegazione, nessun preambolo, nessun JSON.
+  """
