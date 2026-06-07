@@ -1,17 +1,16 @@
+from typing import Annotated
+
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
 from langgraph.graph import MessagesState
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
-from typing_extensions import Optional, Annotated, Sequence
-from langchain_core.messages import BaseMessage
+from typing_extensions import Optional
 from langgraph.graph import MessagesState
-from langgraph.graph.message import Any, add_messages
+from langgraph.graph.message import BaseMessage, add_messages
 from pydantic import BaseModel, Field
 import os
 from tavily import TavilyClient
-import operator
-
 
 load_dotenv() 
 if not os.environ.get("OPENAI_API_KEY"):
@@ -19,15 +18,17 @@ if not os.environ.get("OPENAI_API_KEY"):
 if not os.environ.get("TAVILY_API_KEY"):
     print("Attenzione: TAVILY_API_KEY non trovata nel file .env!")
 
-llm = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
+llm_p = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
+llm = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
+
 #llm_p = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
-llm_p = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
-#llm = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
+llm_x=init_chat_model("groq:openai/gpt-oss-120b", temperature=0)
+
 tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 
 class AgentInputState(MessagesState):
     """Input state for the full agent - only contains messages from user input."""
-    pass
+    query: str
 
 class AgentState(MessagesState):
     """
@@ -37,13 +38,23 @@ class AgentState(MessagesState):
     Note: Some fields are duplicated across different state classes for proper
     state management between subgraphs and the main workflow.
     """
-    Request: str  #Richiesta iniziale
+    query: str
     classification_decision: Literal["Review", "News", "Suggestion"] #classificazione
-    reasoning_classification: Optional[str] #Motivazione della classificazione
-    research_brief: Optional[str] #Query dopo chiarificazione
-    compose_res: str #Risultato finale
+    merge_result: str #Risultato finale dopo merge
+    final_proposal: Optional[str] #Testo definitivo dopo HITL 
+    user_feedback: Optional[str] #Feedback testuale dell'utente (se fornito)
 
+class TriageState(MessagesState):
+    query: str #Query scritta dall'utente
+    classification_decision: Literal["Review", "News", "Suggestion"] #classificazione
+    reasoning_classification: Optional[str] #pensiero di classificazione
+    triage_messages: Annotated[list, add_messages] 
 
+class StateSuggestion(MessagesState):
+    query: str #Query scritta dall'utente
+    suggestion_messages: Annotated[list, add_messages]
+    merge_result: Optional[str]
+    
 class ContentRouterSchema(BaseModel):
     """Classifies and routes user requests based on intent."""
 

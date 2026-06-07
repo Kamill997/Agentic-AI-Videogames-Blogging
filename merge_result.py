@@ -1,5 +1,5 @@
 import json
-from State_tameplate import AgentState, llm
+from State_tameplate import AgentState, llm_p
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 # Assumo che tu abbia i prompt importati
 from prompts.prompt_merge import summarize_webpage_gameReview, summarize_webpage_news
@@ -10,7 +10,6 @@ def merge_result(state: AgentState):
     li combina e genera un report finale.
     """
     messages = state["messages"]
-    
     topic = state["classification_decision"]
     
     all_contents = []
@@ -28,15 +27,13 @@ def merge_result(state: AgentState):
     combined_content = "\n\n".join(all_contents)
     
     # 3. GENERA IL RIASSUNTO
-    # Se per qualche motivo i tool non hanno prodotto nulla, evitiamo di far crashare l'LLM
     if not combined_content.strip():
         final_summary = "Nessun dato raccolto dai tool per poter generare un riassunto."
     else:
         final_summary = summarize_webpage_content(combined_content, topic)
 
     # 4. AGGIORNA LO STATO
-    # Restituiamo il riassunto come un nuovo messaggio dell'AI (o puoi salvarlo in un'altra chiave di stato)
-    return {"compose_res": final_summary}
+    return {"merge_result": final_summary}
 
 
 def summarize_webpage_content(webpage_content: str, topic: str) -> str:
@@ -45,17 +42,16 @@ def summarize_webpage_content(webpage_content: str, topic: str) -> str:
     """
     try:
         # Seleziona il prompt in base al topic
-        if topic == "Review":
-            summarize_prompt = summarize_webpage_gameReview
-        else: # Default
+        if topic == "News":
             summarize_prompt = summarize_webpage_news
+        else: 
+            summarize_prompt = summarize_webpage_gameReview
 
-        # Chiamata all'LLM (Nota: usiamo invoke e passiamo il template formattato)
-        summary = llm.invoke([
+        summary = llm_p.invoke([
             HumanMessage(content=summarize_prompt.format(webpage_content=webpage_content))
         ])
         
-        formatted_summary = f"<summary>\n{summary.content}\n</summary>\n\n"
+        formatted_summary = f"{summary.content}\n"
         return formatted_summary
         
     except Exception as e:
