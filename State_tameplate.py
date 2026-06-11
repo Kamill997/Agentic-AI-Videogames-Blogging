@@ -20,8 +20,6 @@ if not os.environ.get("TAVILY_API_KEY"):
 
 llm_p = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
 llm = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
-
-#llm_p = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
 llm_x=init_chat_model("groq:openai/gpt-oss-120b", temperature=0)
 
 tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
@@ -92,8 +90,7 @@ class InfoPostReview(BaseModel): #usato per estrarre info per aggiungere il nodo
     titolo: str = Field(description="Un titolo estratto o generato per il post")
     gioco: str = Field(description="Il nome del videogioco principale recensito")
     case_editrici: List[str] = Field(description="Lista separata di ogni casa editrice o software house trovata.")
-    genere: Optional[str] = Field(default=None, description="Genere del gioco usando terminologia tecnica (es: FPS, RPG, Soulslike).")
-
+    genere: List[str] = Field(default=[],description="Lista dei generi del gioco. REGOLA TASSATIVA: Separa SEMPRE i generi composti in elementi singoli. Es: se il testo dice 'Action-Avventura' o 'Action/RPG', tu devi restituire ['Action', 'Avventura'] o ['Action', 'RPG']. Usa l'iniziale maiuscola.")
 class InfoPostNews(BaseModel): #usato per estrarre info per aggiungere il nodo news
     titolo: str = Field(description="Un titolo estratto o generato per il post")
     titoli_interessati: List[str] = Field(default_factory=list, description="Lista dei titoli di giochi o franchise menzionati nella news")

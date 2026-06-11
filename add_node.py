@@ -28,7 +28,14 @@ def create_post_node_in_neo4j(state: AgentState):
         if topic == "Review":
             # Chiamata LLM accoppiata al tuo schema InfoPostReview
             llm_estrattore = llm_p.with_structured_output(InfoPostReview)
-            prompt = f"Analizza questa recensione ed estrai i metadati richiesti:\n\n{content}"
+            prompt = (
+                "Analizza questa recensione ed estrai i metadati richiesti.\n"
+                "REGOLA TASSATIVA PER I GENERI: Se nel testo trovi generi composti "
+                "(es. 'Action-Avventura', 'Action/RPG', 'Sparatutto in prima persona, Stealth'), "
+                "devi OBBLIGATORIAMENTE separarli e restituirli come elementi singoli in una lista "
+                "(es. ['Action', 'Avventura'] o ['FPS', 'Stealth']). Non restituire mai un genere composto da punteggiatura.\n\n"
+                f"Testo della recensione:\n{content}"
+            )            
             extracted_data = llm_estrattore.invoke([HumanMessage(content=prompt)])
             post_id = create_review_post(session, extracted_data, content, data_odierna, link_sorgente)
         
@@ -54,19 +61,20 @@ def create_review_post(session, post_data: InfoPostReview, content: str, data_po
     MERGE (g:Game { nome: $gioco })
     MERGE (p)-[:ABOUT]->(g)
     
-    // Gestione editori come lista
+    // Gestione editori
     WITH p
     UNWIND $case_editrici AS editore_nome
     WITH p, editore_nome WHERE editore_nome IS NOT NULL AND editore_nome <> ''
     MERGE (pub:Publisher { nome: editore_nome })
     MERGE (p)-[:PUBLISHED_BY]->(pub)
     
-    // Gestione genere singolo
+    // --- GESTIONE GENERI MULTIPLI COME LISTA ---
     WITH p
-    FOREACH (_ IN CASE WHEN $genere IS NULL OR $genere = '' THEN [] ELSE [1] END |
-        MERGE (gen:Genere { nome: $genere })
-        MERGE (p)-[:HAS_GENERE]->(gen)
-    )
+    UNWIND $genere AS genere_nome
+    WITH p, genere_nome WHERE genere_nome IS NOT NULL AND genere_nome <> ''
+    MERGE (gen:Genere { nome: genere_nome })
+    MERGE (p)-[:HAS_GENERE]->(gen)
+    // -------------------------------------------
     
     // Gestione sorgenti
     WITH p
@@ -76,13 +84,14 @@ def create_review_post(session, post_data: InfoPostReview, content: str, data_po
     )
     RETURN p.id AS post_id
     """
+    
     result = session.run(
         query,
         {
             "titolo": post_data.titolo,
             "gioco": post_data.gioco,
             "case_editrici": post_data.case_editrici,
-            "genere": post_data.genere,
+            "genere": post_data.genere, # Passiamo direttamente la lista generata dall'LLM
             "content": content,
             "data_post": data_post,
             "links": links
