@@ -7,6 +7,7 @@ INPUT:
 OBIETTIVO:
 Scrivi una recensione completa, scorrevole e informativa, eliminando completamente elementi non rilevanti della pagina web 
 (pubblicità, menu, footer, commenti, immagini, contenuti correlati, call to action, cookie banner, ecc.).
+Sei tu il recensore quindi scrivi in prima persona come AUTORE  
 
 REGOLE:
 * NON copiare frasi originali.
@@ -16,17 +17,16 @@ REGOLE:
   * “la recensione afferma”
   * “secondo il recensore”
   * “il sito dice”
-  * "Non ci sono onformazioni su"
+  * "Non ci sono informazioni su"
   * "Non è presente il voto per questa recensione"
 * Scrivi come una vera recensione editoriale.
 * Ogni informazione deve comparire UNA SOLA VOLTA.
 * NON DEVI ESSERE RIPETITIVO, evita di ripetere lo stesso concetto con parole diverse.
 
-STRUTTURA RECENSIONE:
-La recensione DEVE essere strutturata secondo i paragrafi (con titolo) in maniera discorsiva:
+STRUTTURA RECENSIONE OBBLIGATORIA E TASSATIVA:
+La recensione DEVE essere strutturata PER PARAGRAFI (con titolo) in maniera discorsiva:
 - Intro (in cui si dice il titolo,il genere(sparatutto, strategico, simulatore di guida, avventura,ecc) la data di uscita, piattafrome su cui è disponibile, casa editrice, contesto  di uscita se rilevante ed altre info)
-- Introduzione al contesto narrativo, al personaggio principale, alla storia, all'ambientazione (spazio, antico egitto, futuristico) con frasi ad effetto che portano al continuo della lettura della recensione
-- Trama e incipit della storia (senza spoiler)
+- Introduzione al contesto narrativo, al personaggio principale, alla storia, all'ambientazione (spazio, antico egitto, futuristico) con frasi ad effetto che portano al continuo della lettura della recensione. Trama e incipit della storia (senza spoiler):racconta lo scopo del protagonista e su cosa si concentra la trama
 - Gameplay DETTAGLIATO (non riportare nessuna informazione su altri elementi come grafica, audio, prestazioni, ecc in questa sezione, che deve essere focalizzata SOLO sul gameplay)
    * informazioni relative al gameplay, ossia cosa si fa, se si guida, si spara, se si combatte ecc
    * Struttura di gioco (open world, mission based, roguelike, survival, immersive sim, souls like ecc.)
@@ -37,8 +37,8 @@ La recensione DEVE essere strutturata secondo i paragrafi (con titolo) in manier
 - Grafica, direzione artistica e Audio
 - Prestazioni
 - Punti di forza e difetti
-- Presenza di DLC o contenuti aggiuntivi (riportare il titolo e le informazioni sui  DLC SE PRESENTI, se è un DLC OVVIAMENTE NON PARLARE DI QUESTO CAMPO)
-- Voto (ESCLUSIVAMENTE se presente IN QUALCHE RECENSIONE originale, altrimenti omettilo completamente)
+- Presenza di DLC o contenuti aggiuntivi (riportare il titolo e le informazioni sui  DLC SE PRESENTI, se è un DLC OVVIAMENTE NON PARLARE DI QUESTO CAMPO). SE NON PRESENTI DI SOLAMENTE CHE NON SONO PRESENTI DLC
+- Voto *METTILO ESCLUSIVAMENTE se presente IN QUALCHE RECENSIONE originale, altrimenti omettilo completamente*
 
 La sezione gameplay DEVE descrivere:
 Gameplay principale (meccaniche di gameplay, ad es combattimento a turni, possibilità di uso di superpoteri, tipologia di armi ecc)
@@ -84,6 +84,7 @@ NON usare:
 “la notizia afferma”
 “secondo il sito”
 “l’articolo dice”
+"L'evento principale è"
 
 Scrivi sempre come una vera news editoriale.
 DEVI RIPORTARE TASSATIVAMENTE TUTTE LE INFORMAZIONI CHE HAI RICEVUTO, senza tralasciare nulla di importante.
@@ -92,21 +93,21 @@ NON DIRE COSE OVVIE COME Il gioco offre una struttura di gioco lineare, oppure i
 NON inventare FATTI ED OPINIONI, DEVI BASARTI ESCLUSIVAMENTE SUI DATI RICEVUTI.
 
 Identifica e riporta:
-Gioco, azienda, prodotto coinvolto, evento principale , fatto accaduto
+Gioco, azienda, prodotto coinvolto, evento principale , fatto accaduto, notizie rilevanti
 Informazioni nuove o importanti
 Data di uscita o finestra di lancio se presenti
-Luoghi coinvolti
+Luoghi coinvolti (se presenti)
 Nuove funzionalità, update o contenuti
 Eventuali dettagli tecnici
 Informazioni ufficiali rilevanti
 Impatto della notizia sul gioco o sulla community
 
 STRUTTURA DELLA NEWS (TASSATIVA):
-Il tuo output deve contenere ESCLUSIVAMENTE i seguenti tre paragrafi, scritti esattamente così, senza inventare MAI altri titoli o sezioni:
+Il tuo output deve contenere ESCLUSIVAMENTE i seguenti TRE PARAGRAGI, scritti esattamente così, senza inventare MAI altri titoli o sezioni:
 -NEWS
 [Qui inserisci il titolo della news in formato giornalistico]
 -INTRODUZIONE
-[Scrivi qui un'introduzione breve indicando l'argomento che verrà trattato. Qui non devi essere specifico . Integra in questo paragrafo: il gioco, l'azienda, l'evento principale, la data di uscita o la finestra di lancio se presenti, e i luoghi coinvolti].
+[Scrivi qui un'introduzione molto breve indicando l'argomento che verrà trattato. Qui non devi essere specifico . Integra in questo paragrafo: il gioco, l'azienda, la notizia principale, la data di uscita o la finestra di lancio se presenti, e i luoghi coinvolti].
 -CONTENUTO PRINCIPALE
 [Scrivi qui il corpo della notizia con tutti i dettagli. Integra in questo paragrafo: i dettagli tecnici, le nuove funzionalità/update, le informazioni ufficiali rilevanti, le informazioni nuove o importanti e l'impatto che la notizia ha sul gioco o sulla community].
 
@@ -129,4 +130,6 @@ Linguaggio naturale e professionale.
 PROIBITO clickbait.
 PROIBITE opinioni personali.
 PROIBITI toni sensazionalistici.
+
+
 """

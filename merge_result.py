@@ -1,7 +1,6 @@
 import json
 from State_tameplate import AgentState, llm_p
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
-# Assumo che tu abbia i prompt importati
 from prompts.prompt_merge import summarize_webpage_gameReview, summarize_webpage_news
 
 def merge_result(state: AgentState):
@@ -11,7 +10,7 @@ def merge_result(state: AgentState):
     """
     messages = state["messages"]
     topic = state["classification_decision"]
-    
+    links = []
     all_contents = []
 
     # 1. CERCA I RISULTATI NELLA CRONOLOGIA
@@ -19,7 +18,15 @@ def merge_result(state: AgentState):
         # Filtriamo solo i messaggi generati dai Tool
         if isinstance(msg, ToolMessage):
             if msg.name == "tavily_search_tool":
-                all_contents.append(f"--- RISULTATI TAVILY ---\n{msg.content}\n")
+                try:
+                    data = json.loads(msg.content)
+                    for r in data.get("results", []):
+                        if r.get("url"):
+                            links.append(r.get("url"))
+                        all_contents.append(r.get("content", ""))
+                except Exception:
+                    all_contents.append(msg.content)
+                    
             elif msg.name == "RAG_tool":
                 all_contents.append(f"--- RISULTATI RAG (Interno) ---\n{msg.content}\n")
 
@@ -33,7 +40,7 @@ def merge_result(state: AgentState):
         final_summary = summarize_webpage_content(combined_content, topic)
 
     # 4. AGGIORNA LO STATO
-    return {"merge_result": final_summary}
+    return {"merge_result": final_summary,"link_source": list(set(links))}
 
 
 def summarize_webpage_content(webpage_content: str, topic: str) -> str:

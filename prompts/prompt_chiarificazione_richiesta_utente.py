@@ -8,14 +8,12 @@ clarify_review_instructions = """
 
   CRITERI DI APPROVAZIONE (need_clarification = false)
   Approva SEMPRE se il gioco è chiaramente identificabile, ovvero:
-  - È un titolo standalone ben definito (es. "It Takes Two", "Elden Ring").
   - È una serie accompagnata da un capitolo specifico (es. "Assassin’s Creed Origins", "COD Modern Warfare 2").
-  - Il titolo è chiaro anche se manca la piattaforma o la versione.
+  - Il titolo è chiaro anche se manca la piattaforma o la versione  (es. "It Takes Two", "Elden Ring").
 
   CRITERI DI CHIARIMENTO (need_clarification = true)
   Richiedi un chiarimento SOLO ED ESCLUSIVAMENTE nei seguenti casi:
-  1. Il titolo è una serie multi-capitolo e manca il capitolo specifico (es. "Voglio la recensione di Assassin's Creed" -> Quale capitolo?).
-  2. Il testo è una richiesta generica ambigua (es. "voglio una recensione", "parlami di un gioco per PS5","recensione gioco").
+  1. Il testo è una richiesta generica ambigua (es. "voglio una recensione", "parlami di un gioco per PS5","recensione gioco").
 
   REGOLE TASSATIVE PER LA DOMANDA DI CHIARIMENTO:
   - NON RIPETERE MAI LA STESSA DOMANDA O DOMANDE SIMILI
@@ -42,7 +40,7 @@ clarify_news_instructions = """
 
   CRITERI DI APPROVAZIONE (need_clarification = false)
   Approva SEMPRE se la richiesta indica un argomento o un soggetto di ricerca comprensibile, tra cui:
-  - Titoli di videogiochi, hardware o console (es. "GTA 6", "Nintendo Switch 2").
+  - Titoli di videogiochi (es. "GTA 6", "Nintendo Switch 2").
   - Aziende, sviluppatori o esponenti del settore (es. "Ubisoft", "Hideo Kojima").
   - Eventi, patch o aggiornamenti (es. "State of Play", "Aggiornamento Fortnite").
   - Notizie e tendenze generiche ben contestualizzate (es. "Prossimi eventi di gaming", "Tendenze videogiochi 2026").
@@ -81,6 +79,11 @@ transform_messages_into_research_topic_prompt = """
   4. LINGUAGGIO MACCHINA (NO CONVERSAZIONE): Elimina qualsiasi verbo o frase colloquiale (es. "vorrei", "cerco", "mi fai").
   5. STILE ASCIUTTO: Riduci tutto alle parole chiave essenziali (es. "Vorrei fare una recensione di Doom Eternal per favore" -> "Recensione Doom Eternal").
 
-  FORMATO DI OUTPUT:
-  Restituisci SOLO ED ESCLUSIVAMENTE la stringa della query di ricerca finale. Nessuna spiegazione, nessun preambolo, nessun JSON.
-  """
+  Il tuo output deve essere ESCLUSIVAMENTE un oggetto JSON conforme allo schema ResearchQuestion definito.
+1. CAMPO 'game_name':
+   - Deve contenere il nome ufficiale, univoco e completo del videogioco.
+   - Non usare abbreviazioni colloquiali (es. usa "The Legend of Zelda: Ocarina of Time" invece di "Zelda Ocarina").
+
+2. CAMPO 'research_brief':
+   - Deve essere la query generata.
+ """

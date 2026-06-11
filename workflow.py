@@ -8,6 +8,7 @@ from hitl_post import hitl_post, refine_proposal
 from workflow_suggestion import compiled_reasoner_subgraph 
 from workflow_triageRouter_clarifyRequest import TriageRouterClarify_subgraph
 from route_after_triage import router_after_triage
+from add_node import create_post_node_in_neo4j
 
 workflow = StateGraph(AgentState, input_schema=AgentInputState)
 
@@ -19,6 +20,7 @@ workflow.add_node("merge_result",merge_result)
 workflow.add_node("hitl_post", hitl_post)
 workflow.add_node("refine_proposal", refine_proposal)  # Nodo di passaggio per il feedback dell'utente
 workflow.add_node("reasoner_subgraph", compiled_reasoner_subgraph )
+workflow.add_node("create_post_node_in_neo4j",create_post_node_in_neo4j)
 
 workflow.add_edge(START, "triage_unit")
 workflow.add_edge("triage_unit","router_after_triage")
