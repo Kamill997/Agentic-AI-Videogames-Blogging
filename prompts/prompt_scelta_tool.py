@@ -49,7 +49,6 @@ REGOLA SINTATTICA TASSATIVA PER LA QUERY:
 - La stringa di ricerca (query) deve contenere SOLO parole chiave reali (es. "Split Fiction patch notes", "Gta 6 trailer news").
 - Non inserire MAI parole del gergo tecnico del sistema (come "RAG", "tool", "database", "funzione") all'interno della query di ricerca su internet.
 - NON FARE MAI LA STESSA RICERCA O RICERCHE SIMILI MA CON PAROLE DIVERSE
-- FAI SEMPRE RICERCHE PER SINGOLI GIOCHI (non cercare Data uscita it take two, sekiro MA FAI DUE QUERY DIVERSE) 
 
 <Target delle Informazioni (Cosa devi assolutamente trovare)>
 In base al tipo di news, devi focalizzare le tue query per scovare:

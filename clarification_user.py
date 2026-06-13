@@ -1,5 +1,4 @@
 from langgraph.graph import END
-
 from State_tameplate import TriageState, ClarifyWithUser, ResearchQuestion
 from prompts.prompt_chiarificazione_richiesta_utente import clarify_news_instructions,clarify_review_instructions,transform_messages_into_research_topic_prompt
 from langchain_core.messages import HumanMessage, AIMessage, get_buffer_string
@@ -51,10 +50,9 @@ def write_research_brief(state: TriageState):
             messages=get_buffer_string(state.get("triage_messages", []))
         ))
     ])
-    print(f"QUERY CREATA:{response.research_brief}")
     classificazione = state.get("classification_decision") 
     post_trovati = cerca_post_per_parola(response.game_name, classificazione)
-    lista_formattata = "\n".join([f"• **{p['title']}** (Categoria: {p['tipo']})" for p in post_trovati])
+    lista_formattata = "\n".join([f" **{p['title']}** (Categoria: {p['tipo']})" for p in post_trovati])
     if post_trovati:
        
         request = {
@@ -65,7 +63,7 @@ def write_research_brief(state: TriageState):
                 "allow_accept": True, 
                 "allow_ignore": True},
             "description": (
-                f" Ho trovato dei contenuti esistenti per **{response.game_name}**:\n\n"
+                f" Ho trovato dei contenuti esistenti per {response.game_name}:\n\n"
                 f"{lista_formattata}\n\n"
                 "Vuoi procedere con la creazione di un nuovo post o annullare?"
             ),

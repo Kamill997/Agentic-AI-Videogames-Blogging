@@ -2,7 +2,7 @@ from langgraph.graph import END, StateGraph
 from State_tameplate import StateSuggestion
 from reasoner_suggestion import reasoning_suggestion_node, tool_node_suggestion,route_after_suggestion
 
-def build_reasoner_subgraph():
+def build_suggestion_subgraph():
 
     builder = StateGraph(StateSuggestion)
     builder.set_entry_point("reasoning_suggestion_node")
@@ -18,4 +18,4 @@ def build_reasoner_subgraph():
     
     return builder.compile()
 
-compiled_reasoner_subgraph= build_reasoner_subgraph()
+compiled_suggestion_subgraph= build_suggestion_subgraph()

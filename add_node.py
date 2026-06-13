@@ -39,7 +39,7 @@ def create_post_node_in_neo4j(state: AgentState):
             extracted_data = llm_estrattore.invoke([HumanMessage(content=prompt)])
             post_id = create_review_post(session, extracted_data, content, data_odierna, link_sorgente)
         
-        else:  # Caso "News"
+        else:  
             llm_estrattore = llm_p.with_structured_output(InfoPostNews)
             prompt = f"Analizza questa news ed estrai i videogiochi coinvolti e il publisher se presente:\n\n{content}"
             extracted_data = llm_estrattore.invoke([HumanMessage(content=prompt)])

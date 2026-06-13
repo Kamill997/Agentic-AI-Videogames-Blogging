@@ -54,6 +54,12 @@ def triage_router(state: TriageState) -> Command[Literal["clarify_with_user",END
             "classification_decision": result.classification,
             "reasoning_classification": result.reasoning,
         }
+    elif result.classification == "Planning":
+        goto = END
+        update = {
+            "classification_decision": result.classification,
+            "reasoning_classification": result.reasoning,
+        }
         
     elif result.classification == "Ignore":
         goto = END

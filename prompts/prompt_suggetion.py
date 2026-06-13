@@ -35,14 +35,15 @@ DIVIETO ASSOLUTO DI DOPPIA RICERCA :
 3) DEVI FARE RICERCHE SOLO PER LA TIPOLOGIA E GENERE SCELTO (NON CERCARE PLATFROM SE HAI SCELTO COME GENERE FPS)
 Esegui questo ciclo di validazione invocando il tool di ricerca web:
 1. Ricerca iniziale: Lancia la tua query mirata in base alla tua singola scelta, NON FARE MAI PIù RICERCHE CON QUERY SIMILI:
-   - PER LE NEWS lancia query ampie sull'attualità del momento (es. "ultime notizie videogiochi", "annunci videogiochi recenti", "breaking news videogames").
+   - PER LE NEWS lancia query ampie sull'attualità del momento (es. "ultime notizie videogiochi", "annunci videogiochi recenti", "breaking news videogames").DEVI ASSOLUTAMENTE VERIFICARE LA DATA DELLA NEWS E DELLE INFORMAZIONI RIPORTATE FACENDO UNA RICERCA SU INTERNET , SE LA NEWS è VECCHIA SCARTALA E CERCA ANCORA.
    - PER LE RECENSIONI usa query di scoperta sui videogiochi in questa fase, focalizzandoti sul genere carente individuato (es. "videogiochi che vale la pensa giocare", "videogiochi classici da giocare"), non ti interessa sapere la recensione ma solo il gioco. È DI FONDAMENTALE IMPORTANZA CHE PER LA RECENSIONE IL GIOCO SIA GIÀ USCITO. NON CERCARE "Videogiochi in uscita a Giugno" o "Videogiochi in uscita nel 2026". Assicurati che il Videogiochi scoperto sia già uscito sul mercato.
-2. Una volta fatta la ricerca generica (SOLO PER LE RECENSIONI):
+   - PER GLI EVENTI/NEWS: LA NEWS DEVE ESSERE RELATIVA SOLO AD UNA NOTIZIA (NO: News uscita god of war e tomb raider. SI: News Uscita Tomb radier. SI: Uscita god of war). Ti basta il nome dell'evento o il focus della notizia, e verifica che la NEWS NON SIA PIU VECCHIA DI 4 GIORNI rispetto a {data}. SE LA NEWS è VECCHIA DI 4 GIORNI SCARTALA ASSOLUTAMENTE E CONTINUA A CERCARE.
+
+   2. Una volta fatta la ricerca generica (SOLO PER LE RECENSIONI):
    - DEVI EFFETTUARE RICERCHE GENERALI SUI VIDEOGIOCHI OTTENUTI IN MODO DI AVERE UN'IDEA SICURA DI OGNI SINGOLO VIDEOGIOCO. (SE OTTIENI 4 VIDEOGIOCHI, FAI RICERCHE GENERALI SEPARATE SU TUTTI I VIDEOGIOCHI IN MODO DA AVERE MAGGIORI INFORMAZIONI)
-   - DEVI ASSOLUTAMENTE VERIFICARE LA DATA DELLA NEWS E DELLE INFORMAZIONI RIPORTATE, SE LA NEWS è VECCHIA SCARTALA E CERCA ANCORA
+   - DEVI ASSOLUTAMENTE VERIFICARE LA DATA DELLA NEWS E DELLE INFORMAZIONI RIPORTATE, SE LA NEWS è VECCHIA SCARTALA E CERCA ANCORA.
 2. STOP ALLE RICERCHE DI DETTAGLIO: Appena individui un argomento valido per prendere la decisione, FERMATI. NON cercare informazioni aggiuntive come sviluppatore, piattaforme o trama.
    - PER LE RECENSIONI: Ti basta solo il nome del gioco, il genere e la data di uscita (CHE DEVE ESSERE PRECEDENTE ALLA DATA ATTUALE, ALTRIMENTI SCARTALO E CONTINUA A CERCARE).
-   - PER GLI EVENTI/NEWS: Ti basta il nome dell'evento o il focus della notizia, e verificare che sia recente rispetto a {data}. SE LA NEWS è VECCHIA DI 7 GIORNI SCARTALA ASSOLUTAMENTE E CONTINUA A CERCARE.
 3. Verifica dello Storico (Accetta / Scarta):
    - PER LE RECENSIONI: Confronta il titolo ed il genere del gioco scelto con i dati di Neo4j GIA RECUPERATI. Se è già stato recensito di recente o è presente una recensione recente su un gioco diverso ma stesso genere SCARTALO e fai una nuova ricerca esplorativa. Se è nuovo e bilancia il blog, ACCETTALO. NON IMPORTA SE è UN GIOCO MOLTO RECENSITO SU INTERNET, L'IMPORTANTE CHE NON è TRATTATO NEL MIO BLOG
    - PER LE NEWS: Controlla se la stessa IDENTICA notizia o evento è già nello storico. Se c'è già, SCARTALA. Se non c'è, ACCETTALA a prescindere dal gioco o genere trattato.

@@ -69,11 +69,12 @@ def get_least_populated_category_info_tool() -> str:
             dati_json = json.dumps(lista_post, indent=2, ensure_ascii=False)
             
             # 6. AVVISO ESPLICITO PER L'LLM
+            recap_numeri = f"[Conteggio attuale -> News: {categorie_base['News']}, Review: {categorie_base['Review']}]"
             if len(categorie_scelte) == 1:
                 # Caso Disparità: Imponiamo la scelta
                 categoria_obbligatoria = categorie_scelte[0]
                 return (
-                    f"ATTENZIONE - DIRETTIVA OBBLIGATORIA: Il database è sbilanciato. "
+                    f"ATTENZIONE - DIRETTIVA OBBLIGATORIA: Il database è sbilanciato. {recap_numeri}\n"
                     f"La categoria più carente è '{categoria_obbligatoria}'. "
                     f"DEVI ASSOLUTAMENTE scegliere il formato '{categoria_obbligatoria}' per la tua nuova proposta, "
                     f"non ti è permesso scegliere l'altra. \n"
@@ -95,27 +96,109 @@ def get_least_populated_category_info_tool() -> str:
     
 
 @tool
-def tool_cerca_post(parola: str) -> str:
+def check_active_plan_tool() -> str:
     """
-    Cerca nei titoli dei post per una parola chiave.
-    Usalo per verificare se un argomento è già stato trattato.
-    Args:
-        parola: parola da cercare nel titolo, es. "Elden Ring"
+    Verifica se esistono nodi PENDING. 
+    Se esistono, li ordina per 'ordine'. 
+    Se non esistono, ritorna il messaggio di nessun piano.
     """
-    risultati = cerca_post_per_parola(parola)
-    if not risultati:
-        return f"Nessun post trovato con '{parola}' nel titolo."
-    testo = f"Post trovati con '{parola}':\n"
-    for p in risultati:
-        testo += f"  - [{p['tipo']}] {p['title']}\n"
-    return testo
-
-def cerca_post_per_parola(parola):
     query = """
-    MATCH (p:Post)
-    WHERE toLower(p.titolo) CONTAINS toLower($parola)
-    RETURN p.titolo AS title, p.tipo_post AS tipo
+        MATCH (p:Pianificazione {stato: 'PENDING'})
+        WITH p
+        ORDER BY COALESCE(p.ordine, 0) ASC
+        RETURN collect(p.titolo) AS titoli
     """
-    with neo4j_driver.session() as session:
-      return session.run(query, {"parola": parola})
     
+    with neo4j_driver.session() as session:
+        result = session.run(query).single()
+        titoli = result["titoli"] if result else []
+    
+    if titoli:
+        return f"PIANO_ATTIVO: Ecco gli articoli in attesa: {', '.join(titoli)}"
+    
+    return "NESSUN_PIANO: Non c'è alcuna pianificazione attiva al momento."
+
+@tool
+def get_planning_context_tool() -> str:
+    """
+    Recupera contesto strategico aggiornato basato sullo schema:
+    Nodi: Post (con proprietà tipo_post), Game, Genere.
+    Relazioni: ABOUT, HAS_GENERE.
+    """
+    query = """
+    // 1. Conteggi totali basati su tipo_post
+    MATCH (p:Post)
+    WITH count(CASE WHEN p.tipo_post = 'News' THEN 1 END) AS news_count,
+         count(CASE WHEN p.tipo_post = 'Review' THEN 1 END) AS rec_count
+    
+ 
+    OPTIONAL MATCH (p:Post {tipo_post: 'Review'})-[:HAS_GENERE]->(gen:Genere)
+    WITH news_count, rec_count, gen.nome AS genere, p.data AS data
+    ORDER BY data DESC LIMIT 5
+    WITH news_count, rec_count, collect(DISTINCT genere) AS recent_genres
+    
+    // 3. Titoli delle News recenti (ultimi 5 giorni)
+    OPTIONAL MATCH (n:Post {tipo_post: 'News'})
+    WHERE date(n.data) >= date() - duration('P5D')
+    
+    RETURN 
+        news_count, 
+        rec_count, 
+        recent_genres, 
+        collect(DISTINCT n.titolo) AS recent_news_titles
+    """
+    
+    try:
+        with neo4j_driver.session() as session:
+            result_cursor = session.run(query)
+            record = result_cursor.single()
+            
+            if record is None:
+                news, recs, genres, titles = 0, 0, [], []
+            else:
+                news = record["news_count"]
+                recs = record["rec_count"]
+                genres = record["recent_genres"]
+                titles = record["recent_news_titles"]
+            
+            avvisi = []
+            if news == 0 and recs == 0:
+                avvisi.append("DATABASE VUOTO: Inizia proponendo contenuti iconici.")
+            
+            context = {
+                "avvisi": avvisi,
+                "statistiche": {"news": news, "recensioni": recs},
+                "varietà_tematica": {"ultimi_5_generi": genres},
+                "news_ultimi_5_giorni": titles
+            }
+            
+            return json.dumps(context, indent=2, ensure_ascii=False)
+            
+    except Exception as e:
+        return f"Errore critico durante il recupero del contesto: {str(e)}"
+
+@tool
+def check_game_already_reviewed_tool(game_name: str) -> str:
+    """Verifica se un gioco è già stato recensito nel database. Usa questo tool prima di finalizzare una recensione.
+       Passa come parametro in game_name il nome del gioco
+       """
+    # Query aggiornata per lo schema basato su Post con tipo_post='Review'
+    query = """
+    MATCH (g:Game {nome: $game_name})
+    MATCH (p:Post {tipo_post: 'Review'})-[:ABOUT]->(g)
+    RETURN count(p) > 0 AS gia_recensito
+    """
+    try:
+        with neo4j_driver.session() as session:
+            # Esegui la query
+            result_cursor = session.run(query, game_name=game_name)
+            record = result_cursor.single()
+            
+            # Verifica se il gioco è stato trovato e se è già recensito
+            if record and record["gia_recensito"]:
+                return f"SI: Il gioco '{game_name}' è già stato recensito."
+            
+            return "OK: Il gioco è disponibile."
+            
+    except Exception as e:
+        return f"Errore durante la verifica: {str(e)}"

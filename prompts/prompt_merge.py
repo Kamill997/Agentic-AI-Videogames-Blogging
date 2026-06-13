@@ -96,7 +96,6 @@ Identifica e riporta:
 Gioco, azienda, prodotto coinvolto, evento principale , fatto accaduto, notizie rilevanti
 Informazioni nuove o importanti
 Data di uscita o finestra di lancio se presenti
-Luoghi coinvolti (se presenti)
 Nuove funzionalità, update o contenuti
 Eventuali dettagli tecnici
 Informazioni ufficiali rilevanti
