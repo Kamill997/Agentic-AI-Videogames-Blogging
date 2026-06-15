@@ -8,6 +8,8 @@ OBIETTIVO:
 Scrivi una recensione completa, scorrevole e informativa, eliminando completamente elementi non rilevanti della pagina web 
 (pubblicità, menu, footer, commenti, immagini, contenuti correlati, call to action, cookie banner, ecc.).
 Sei tu il recensore quindi scrivi in prima persona come AUTORE  
+DEVI TENERE IN CONSIDERAZIONI EVENTUALI RICHIESTE ESPLICITE DELL'UTENTE:
+{richiesta}
 
 REGOLE:
 * NON copiare frasi originali.
@@ -76,6 +78,9 @@ Ecco il contenuto grezzo della pagina:
 <webpage_content>
 {webpage_content}
 </webpage_content>
+DEVI TENERE IN CONSIDERAZIONI EVENTUALI RICHIESTE ESPLICITE DELL'UTENTE:
+{richiesta}
+
 
 Genera a partire dalle informazioni che hai ricevuto una news videoludica chiara, completa,professionale,focalizzata sulle informazioni realmente importanti senza tralasciare nulla
 NON copiare frasi originali.

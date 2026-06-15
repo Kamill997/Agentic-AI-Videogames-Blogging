@@ -11,25 +11,24 @@ tools_by_name = {tool.name: tool for tool in tools}
 llm_with_tools = llm_p.bind_tools(tools,parallel_tool_calls=False)
 
 def llm_call(state: AgentState):
-    """Analyze current state and decide on next actions.
-    LLM decides whether to call a tool or not
-    The model analyzes the current conversation state and decides whether to:
-    1. Call search tools to gather more information
-    2. Provide a final answer based on gathered information
+    """Analizza lo stato attuale e decidi le azioni successive.
+LLM decide se utilizzare uno strumento di ricerca o meno.
+Il modello analizza lo stato attuale della conversazione e decide se:
+1. Utilizzare strumenti di ricerca per raccogliere ulteriori informazioni.
+2. Fornire una risposta definitiva basata sulle informazioni raccolte.
     """    
     messages = state.get("messages", [])
     data_di_oggi = datetime.now().strftime("%d %B %Y") 
+    richiesta_utente = state.get("query")
 
     if state["classification_decision"] == "News":
-        system_prompt = research_agent_prompt_News.format(data=data_di_oggi)
+        system_prompt = research_agent_prompt_News.format(data=data_di_oggi,richiesta=richiesta_utente)
     else:
-        system_prompt = research_agent_prompt_review
+        system_prompt = research_agent_prompt_review.format(richiesta=richiesta_utente)
 
     invoke_messages = [SystemMessage(content=system_prompt)] + messages
-    
-    return {
-        "messages": [llm_with_tools.invoke(invoke_messages)]
-    }
+
+    return {"messages": [llm_with_tools.invoke(invoke_messages)]}
 
 tool_node = ToolNode(tools)
 

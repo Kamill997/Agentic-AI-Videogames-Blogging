@@ -1,6 +1,6 @@
 from langgraph.graph import END, StateGraph
 from State_tameplate import StateSuggestion
-from reasoner_suggestion import reasoning_suggestion_node, tool_node_suggestion,route_after_suggestion
+from Suggestion.reasoner_suggestion import reasoning_suggestion_node, tool_node_suggestion,route_after_suggestion
 
 def build_suggestion_subgraph():
 

@@ -108,36 +108,37 @@ def check_active_plan_tool() -> str:
         ORDER BY COALESCE(p.ordine, 0) ASC
         RETURN collect(p.titolo) AS titoli
     """
-    
     with neo4j_driver.session() as session:
         result = session.run(query).single()
         titoli = result["titoli"] if result else []
     
     if titoli:
         return f"PIANO_ATTIVO: Ecco gli articoli in attesa: {', '.join(titoli)}"
-    
     return "NESSUN_PIANO: Non c'è alcuna pianificazione attiva al momento."
 
 @tool
 def get_planning_context_tool() -> str:
     """
-    Recupera contesto strategico aggiornato basato sullo schema:
-    Nodi: Post (con proprietà tipo_post), Game, Genere.
-    Relazioni: ABOUT, HAS_GENERE.
+    Recupera numero di review e news, ultime 5 news, generi degli ultimi 5 giochi recensiti:
+.
     """
     query = """
     // 1. Conteggi totali basati su tipo_post
     MATCH (p:Post)
     WITH count(CASE WHEN p.tipo_post = 'News' THEN 1 END) AS news_count,
          count(CASE WHEN p.tipo_post = 'Review' THEN 1 END) AS rec_count
+
+    // 2. Info sulle ultime 5 Recensioni (titoli e generi)
+    OPTIONAL MATCH (p_rev:Post {tipo_post: 'Review'})
+    WITH news_count, rec_count, p_rev
+    ORDER BY p_rev.data DESC LIMIT 5
+    OPTIONAL MATCH (p_rev)-[:HAS_GENERE]->(gen:Genere)
     
- 
-    OPTIONAL MATCH (p:Post {tipo_post: 'Review'})-[:HAS_GENERE]->(gen:Genere)
-    WITH news_count, rec_count, gen.nome AS genere, p.data AS data
-    ORDER BY data DESC LIMIT 5
-    WITH news_count, rec_count, collect(DISTINCT genere) AS recent_genres
+    WITH news_count, rec_count, 
+         collect(DISTINCT p_rev.titolo) AS recent_rec_titles,
+         collect(DISTINCT gen.nome) AS recent_genres
     
-    // 3. Titoli delle News recenti (ultimi 5 giorni)
+    // 3. Titoli e Overview delle News recenti (ultimi 5 giorni)
     OPTIONAL MATCH (n:Post {tipo_post: 'News'})
     WHERE date(n.data) >= date() - duration('P5D')
     
@@ -145,33 +146,33 @@ def get_planning_context_tool() -> str:
         news_count, 
         rec_count, 
         recent_genres, 
-        collect(DISTINCT n.titolo) AS recent_news_titles
+        recent_rec_titles,
+        collect(DISTINCT {titolo: n.titolo, overview: n.overview}) AS recent_news_details
+        
     """
     
     try:
         with neo4j_driver.session() as session:
             result_cursor = session.run(query)
             record = result_cursor.single()
-            
+            avvisi = []
+
             if record is None:
-                news, recs, genres, titles = 0, 0, [], []
+                news, recs, genres, rec_titles, news_details = 0, 0, [], [], []
             else:
                 news = record["news_count"]
                 recs = record["rec_count"]
                 genres = record["recent_genres"]
-                titles = record["recent_news_titles"]
-            
-            avvisi = []
-            if news == 0 and recs == 0:
-                avvisi.append("DATABASE VUOTO: Inizia proponendo contenuti iconici.")
-            
+                rec_titles = record["recent_rec_titles"]
+                news_details = record["recent_news_details"] 
             context = {
                 "avvisi": avvisi,
                 "statistiche": {"news": news, "recensioni": recs},
                 "varietà_tematica": {"ultimi_5_generi": genres},
-                "news_ultimi_5_giorni": titles
+                "ultime_recensioni": rec_titles,
+                "news_recenti_dettagli": news_details 
             }
-            
+                        
             return json.dumps(context, indent=2, ensure_ascii=False)
             
     except Exception as e:
@@ -179,22 +180,23 @@ def get_planning_context_tool() -> str:
 
 @tool
 def check_game_already_reviewed_tool(game_name: str) -> str:
-    """Verifica se un gioco è già stato recensito nel database. Usa questo tool prima di finalizzare una recensione.
-       Passa come parametro in game_name il nome del gioco
+    """Usa questo tool prima di finalizzare una recensione.
+       Verifica se un gioco è già stato recensito nel database. 
+       Passa come parametro in game_name il nome del gioco.
        """
-    # Query aggiornata per lo schema basato su Post con tipo_post='Review'
     query = """
-    MATCH (g:Game {nome: $game_name})
-    MATCH (p:Post {tipo_post: 'Review'})-[:ABOUT]->(g)
-    RETURN count(p) > 0 AS gia_recensito
+    OPTIONAL MATCH (g:Game {nome: $game_name})
+    OPTIONAL MATCH (p1:Post {tipo_post: 'Review'})-[:ABOUT]->(g)
+        OPTIONAL MATCH (p2:Post {tipo_post: 'Review'})
+    WHERE toLower(p2.overview) CONTAINS toLower($game_name)
+    
+    RETURN count(p1) > 0 OR count(p2) > 0 AS gia_recensito
     """
     try:
         with neo4j_driver.session() as session:
-            # Esegui la query
             result_cursor = session.run(query, game_name=game_name)
             record = result_cursor.single()
             
-            # Verifica se il gioco è stato trovato e se è già recensito
             if record and record["gia_recensito"]:
                 return f"SI: Il gioco '{game_name}' è già stato recensito."
             

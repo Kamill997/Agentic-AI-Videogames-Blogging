@@ -1,6 +1,6 @@
 import json
 from State_tameplate import AgentState, llm_p
-from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
+from langchain_core.messages import HumanMessage, ToolMessage
 from prompts.prompt_merge import summarize_webpage_gameReview, summarize_webpage_news
 
 def merge_result(state: AgentState):
@@ -10,12 +10,12 @@ def merge_result(state: AgentState):
     """
     messages = state["messages"]
     topic = state["classification_decision"]
+    richiesta_utente = state.get("query")
+
     links = []
     all_contents = []
 
-    # 1. CERCA I RISULTATI NELLA CRONOLOGIA
     for msg in messages:
-        # Filtriamo solo i messaggi generati dai Tool
         if isinstance(msg, ToolMessage):
             if msg.name == "tavily_search_tool":
                 try:
@@ -30,33 +30,27 @@ def merge_result(state: AgentState):
             elif msg.name == "RAG_tool":
                 all_contents.append(f"--- RISULTATI RAG (Interno) ---\n{msg.content}\n")
 
-    # 2. UNISCI TUTTO IL TESTO
     combined_content = "\n\n".join(all_contents)
     
-    # 3. GENERA IL RIASSUNTO
     if not combined_content.strip():
         final_summary = "Nessun dato raccolto dai tool per poter generare un riassunto."
     else:
-        final_summary = summarize_webpage_content(combined_content, topic)
+        final_summary = summarize_webpage_content(combined_content, topic,richiesta_utente)
 
-    # 4. AGGIORNA LO STATO
     return {"merge_result": final_summary,"link_source": list(set(links))}
 
 
-def summarize_webpage_content(webpage_content: str, topic: str) -> str:
+def summarize_webpage_content(webpage_content: str, topic: str,richiesta_utente: str) -> str:
     """
-    Summarize webpage content using the configured summarization model.
+    Riassume il contenuto della pagina web utilizzando il modello di riassunto configurato.
     """
     try:
-        # Seleziona il prompt in base al topic
         if topic == "News":
             summarize_prompt = summarize_webpage_news
         else: 
             summarize_prompt = summarize_webpage_gameReview
 
-        summary = llm_p.invoke([
-            HumanMessage(content=summarize_prompt.format(webpage_content=webpage_content))
-        ])
+        summary = llm_p.invoke([HumanMessage(content=summarize_prompt.format(webpage_content=webpage_content, richiesta=richiesta_utente))])
         
         formatted_summary = f"{summary.content}\n"
         return formatted_summary

@@ -4,6 +4,7 @@ from typing import List
 from langchain_core.messages import HumanMessage
 from neo4j_connection import neo4j_driver
 from State_tameplate import AgentState, llm_p, InfoPostReview, InfoPostNews
+from prompts.prompt_estrattore_info_neo4j import estrazione_features_review,estrazione_features_News
 
 
 def create_post_node_in_neo4j(state: AgentState):
@@ -26,23 +27,13 @@ def create_post_node_in_neo4j(state: AgentState):
 
     with neo4j_driver.session() as session:
         if topic == "Review":
-            # Chiamata LLM accoppiata al tuo schema InfoPostReview
             llm_estrattore = llm_p.with_structured_output(InfoPostReview)
-            prompt = (
-                "Analizza questa recensione ed estrai i metadati richiesti.\n"
-                "REGOLA TASSATIVA PER I GENERI: Se nel testo trovi generi composti "
-                "(es. 'Action-Avventura', 'Action/RPG', 'Sparatutto in prima persona, Stealth'), "
-                "devi OBBLIGATORIAMENTE separarli e restituirli come elementi singoli in una lista "
-                "(es. ['Action', 'Avventura'] o ['FPS', 'Stealth']). Non restituire mai un genere composto da punteggiatura.\n\n"
-                f"Testo della recensione:\n{content}"
-            )            
-            extracted_data = llm_estrattore.invoke([HumanMessage(content=prompt)])
+            extracted_data = llm_estrattore.invoke([HumanMessage(content=estrazione_features_review.format(content=content))])
             post_id = create_review_post(session, extracted_data, content, data_odierna, link_sorgente)
         
         else:  
             llm_estrattore = llm_p.with_structured_output(InfoPostNews)
-            prompt = f"Analizza questa news ed estrai i videogiochi coinvolti e il publisher se presente:\n\n{content}"
-            extracted_data = llm_estrattore.invoke([HumanMessage(content=prompt)])
+            extracted_data = llm_estrattore.invoke([HumanMessage(content=estrazione_features_News.format(content=content))])
             post_id = create_news_post(session, extracted_data, content, data_odierna, link_sorgente)
     return {"neo4j_post_id": post_id}
 
@@ -55,7 +46,8 @@ def create_review_post(session, post_data: InfoPostReview, content: str, data_po
         titolo: $titolo,
         tipo_post: 'Review',
         data: $data_post,
-        content: $content
+        content: $content,
+        overview: $overview
     })
     WITH p
     MERGE (g:Game { nome: $gioco })
@@ -91,7 +83,8 @@ def create_review_post(session, post_data: InfoPostReview, content: str, data_po
             "titolo": post_data.titolo,
             "gioco": post_data.gioco,
             "case_editrici": post_data.case_editrici,
-            "genere": post_data.genere, # Passiamo direttamente la lista generata dall'LLM
+            "genere": post_data.genere,
+            "overview": post_data.overview, 
             "content": content,
             "data_post": data_post,
             "links": links
@@ -107,7 +100,8 @@ def create_news_post(session, post_data: InfoPostNews, content: str, data_post: 
         titolo: $titolo,
         tipo_post: 'News',
         data: $data_post,
-        content: $content
+        content: $content,
+        overview: $overview 
     })
     
     // Srotoliamo i giochi menzionati
@@ -139,7 +133,8 @@ def create_news_post(session, post_data: InfoPostNews, content: str, data_post: 
             "case_editrici": post_data.case_editrici or [],
             "content": content,
             "data_post": data_post,
-            "links": links
+            "overview": post_data.overview, 
+            "links": links,
         }
     )
     record = result.single()

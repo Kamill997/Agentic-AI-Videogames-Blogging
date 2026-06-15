@@ -13,7 +13,7 @@ def executor_node(state: PlanningState):
         with neo4j_driver.session() as session:
             
             # ==========================================
-            # 1) POP NEXT: Estrae, elimina e manda il segnale per il Triage
+            # 1) POP NEXT: Estrae suggerimento, elimina nodo pending su neo4j e manda la query al Triage
             # ==========================================
             if azione == "POP_NEXT":
                 result = session.run(
@@ -48,7 +48,7 @@ def executor_node(state: PlanningState):
                     )
 
             # ==========================================
-            # 2) DO_RESEARCH: Piano approvato, spacchetta, popola la coda e va al Triage
+            # 2) DO_RESEARCH: Piano approvato, crea i nodi pending e va al Triage per creare il primo post
             # ==========================================
             elif azione == "DO_RESEARCH":
 
@@ -59,9 +59,8 @@ def executor_node(state: PlanningState):
                 queries_pulite = estrazione.queries
                 
                 if queries_pulite:
-                    query_corrente = queries_pulite[0] # Il primo post va subito in esecuzione
+                    query_corrente = queries_pulite[0]
                     
-                    # Salva i restanti post su Neo4j come PENDING
                     for indice, q in enumerate(queries_pulite[1:], start=1):
                         session.run(
                             """
@@ -75,11 +74,11 @@ def executor_node(state: PlanningState):
                         )
                     
                     return Command(
-                        goto=END,  # Esce dal sottografo
+                        goto=END, 
                         update={
                             "query": query_corrente,
-                            "next_action": "VAI_AL_TRIAGE", # Segnale per elaborare subito il primo post
-                            "pending_proposal": "",         # Svuota la bozza consumata
+                            "next_action": "VAI_AL_TRIAGE", 
+                            "pending_proposal": "",         
                             "planning_messages": [AIMessage(content=f"Piano salvato in coda. Avvio immediato di: '{query_corrente}'.")]
                         }
                     )
@@ -88,41 +87,37 @@ def executor_node(state: PlanningState):
                         goto=END,
                         update={
                             "next_action": "FINISCI",
-                            "planning_messages": [AIMessage(content="❌ Errore: l'LLM non ha estratto query valide dalla bozza.")]
+                            "planning_messages": [AIMessage(content="Errore: l'LLM non ha estratto query valide dalla bozza.")]
                         }
                     )
 
             # ==========================================
-            # 3) DELETE_EXISTING: Svuota la coda e ferma il flusso
+            # 3) DELETE_EXISTING: Elimina il piano creato
             # ==========================================
             elif azione == "DELETE_EXISTING":
                 session.run("MATCH (p:Pianificazione {stato: 'PENDING'}) DETACH DELETE p")
                 return Command(
                     goto=END,
                     update={
-                        "next_action": "FINISCI", # Segnale di stop per il Grafo Padre
+                        "next_action": "FINISCI", 
                         "pending_proposal": "",
-                        "planning_messages": [AIMessage(content="🗑️ Tutti i nodi Pianificazione PENDING sono stati eliminati.")]
+                        "planning_messages": [AIMessage(content="Tutti i nodi Pianificazione PENDING sono stati eliminati.")]
                     }
                 )
-
             # ==========================================
-            # 4) INTERACTION: Svuota la coda e rimanda internamente a "research_node"
+            # 4) INTERACTION: Elimina il piano esistente e vai dinuovo in executer per ricrearne uno nuovo
             # ==========================================
             elif azione == "INTERACTION":
                 session.run("MATCH (p:Pianificazione {stato: 'PENDING'}) DETACH DELETE p")
-                
-                # Questo è l'unico caso che NON esce dal sottografo, 
-                # ma devia internamente verso il nodo di ricerca.
+     
                 return Command(
                     goto="research_node", 
                     update={
-                        "next_action": "DO_RESEARCH", # Cambia l'azione per preparare il terreno alla ricerca
+                        "next_action": "DO_RESEARCH",
                         "pending_proposal": "",
                         "planning_messages": [AIMessage(content="Vecchio piano rimosso. Avvio della ricerca per il nuovo piano...")]
                     }
                 )
-
     except Exception as e:
         return Command(
             goto=END,
@@ -132,7 +127,6 @@ def executor_node(state: PlanningState):
             }
         )
 
-    # Fallback di sicurezza se l'azione non corrisponde a nessuna delle precedenti
     return Command(
         goto=END, 
         update={"next_action": "FINISCI"}

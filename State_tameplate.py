@@ -28,7 +28,7 @@ class AgentInputState(TypedDict):
     """Input state for the full agent - only contains messages from user input."""
     query:str
 
-class AgentState(MessagesState): #Stato principale
+class AgentState(MessagesState): #Stato principale 
     """
     Main state for the full multi-agent research system.
 
@@ -42,7 +42,7 @@ class AgentState(MessagesState): #Stato principale
     user_feedback: Optional[str] #Feedback testuale dell'utente (se fornito)
     link_source: List[str] # link estratti da Tavily nel nodo merge
         
-class TriageState(MessagesState): #stato del sottografo del triage
+class TriageState(MessagesState): #stato del sottografo del triage 
     query: str #Query 
     classification_decision: Literal["Review", "News", "Suggestion","Planning"] #classificazione
     reasoning_classification: Optional[str] #pensiero di classificazione
@@ -53,19 +53,19 @@ class StateSuggestion(MessagesState): #stato del sottografo suggestion
     suggestion_messages: Annotated[list, add_messages]
     merge_result: Optional[str]
 
-class PlanningState(MessagesState):
-    query: str #Query scritta dall'utente
-    planning_messages: Annotated[list, add_messages] #dove vengono messi tutti i messages
-    active_plan: Optional[str] #se esiste o no il piano
-    pending_proposal: str  #piano proposto
-    next_action: Optional[str] #permette di decidere dove andare
-    message: Optional[str] #messaggio costruito dal planner_node
+class PlanningState(MessagesState): #Stato del planning node 
+    query: str 
+    planning_messages: Annotated[list, add_messages]
+    active_plan: Optional[str] 
+    pending_proposal: str  
+    next_action: Optional[str] 
+    message: Optional[str] 
 
-class PlanningCommand(BaseModel):
+class PlanningCommand(BaseModel): #uscita del planner_node 
     action: Literal["SHOW_MESSAGE", "DO_RESEARCH", "DELETE_EXISTING", "POP_NEXT","INTERACTION", "NONE"]
     message: str
 
-class PlanExtraction(BaseModel):
+class PlanExtraction(BaseModel): #uscita strutturata dell'executer node per estrarre le query del Planning 
     """Schema per l'estrazione delle query dal piano editoriale."""
     queries: List[str] = Field(
         description="La lista delle singole query/post estratti dalla bozza. Devono essere pulite da numeri (1, 2) o bullet points."
@@ -73,49 +73,40 @@ class PlanExtraction(BaseModel):
     
 
 class ContentRouterSchema(BaseModel): #uscita del triage router
-    """Classifies and routes user requests based on intent."""
+    """Classifica e instrada le richieste degli utenti in base all'intento"""
     reasoning: str = Field(
-        description="Short justification for the classification."
+        description="Breve giustificazione per la classificazione fatta"
     )
     classification: Literal["Review", "News", "Suggestion", "Ignore","Planning"] = Field(
-    description=(
-            "The classification of the request content: "
-            "'Review' for detailed evaluations, scores, opinions, or pros/cons about video games or hardware; "
-            "'News' for current events, updates, or announcements related to video games; "
-            "'Suggestion' for creative brainstorming, future topic ideas, editorials, or strategic content guidance;"
-            "'Planning' for requests to create, manage, approve, or advance a daily editorial schedule or publishing plan; "
-            "'Ignore' for requests that do notdirectly pertain to the world of video games, which should be deprioritized and not processed further."    
-        ),
+   description=(
+    "La classificazione del contenuto della richiesta: "
+    "'Review' per valutazioni dettagliate, voti, opinioni o pro/contro su videogiochi o hardware; "
+    "'News' per eventi d'attualità, aggiornamenti o annunci relativi ai videogiochi; "
+    "'Suggestion' per brainstorming creativo, idee per argomenti futuri, editoriali o guida strategica ai contenuti; "
+    "'Planning' per richieste di creazione, gestione, approvazione o avanzamento di un calendario editoriale giornaliero o di un piano di pubblicazione; "
+    "'Ignore' per richieste che non riguardano direttamente il mondo dei videogiochi, le quali dovrebbero essere deprioritizzate e non ulteriormente elaborate."    ),
     )
 
-class ClarifyWithUser(BaseModel): #uscita del clarify_with_user
-    """Schema for user clarification decision and questions."""
-    need_clarification: bool = Field(
-        description="Whether the user needs to be asked a clarifying question.",
-    )
-    question: str = Field(
-        description="A question to ask the user to clarify the report scope",
-    )
+class ClarifyWithUser(BaseModel): #uscita del clarify_with_user  
+    """Output strutturato per la decisione di chiarimenti ed eventuali domande di chiarimento dell'utente."""
+    need_clarification: bool = Field(description="Indica se all'utente deve essere posta una domanda di chiarimento",)
+    question: str = Field(description="Domanda di chiarimento da sottoporre all'utente",)
 
 class ResearchQuestion(BaseModel): #uscite del write_research_brief
-    """Schema for structured research brief generation."""
+    """Uscita strutturata della query completa includendo tutte le chiarificazioni utente"""
     game_name: str = Field(description="Il nome del videogioco principale oggetto della ricerca.")
     research_brief: str = Field(description="La query di ricerca completa generata",)
 
-from typing import TypedDict, Optional, List, Dict
 
-
-class Summary(BaseModel):
-    """Schema for webpage content summarization."""
-    summary: str = Field(description="Concise summary of the webpage content")
-
-class InfoPostReview(BaseModel): #usato per estrarre info per aggiungere il nodo review
-    titolo: str = Field(description="Un titolo estratto o generato per il post")
+class InfoPostReview(BaseModel): #usato per estrarre info per aggiungere il nodo review 
+    titolo: str = Field(description="Un titolo estratto o generato per il post MA che permetta di capire che è una recensione il gioco che si sta recensendo")
     gioco: str = Field(description="Il nome del videogioco principale recensito")
     case_editrici: List[str] = Field(description="Lista separata di ogni casa editrice o software house trovata.")
     genere: List[str] = Field(default=[],description="Lista dei generi del gioco. REGOLA TASSATIVA: Separa SEMPRE i generi composti in elementi singoli. Es: se il testo dice 'Action-Avventura' o 'Action/RPG', tu devi restituire ['Action', 'Avventura'] o ['Action', 'RPG']. Usa l'iniziale maiuscola.")
+    overview: str = Field(description="Un riassunto conciso di tutto ciò di cui si parla nel post, in modo da avere una panormaica COMPLETA del contenuto")
+
 class InfoPostNews(BaseModel): #usato per estrarre info per aggiungere il nodo news
     titolo: str = Field(description="Un titolo estratto o generato per il post")
     titoli_interessati: List[str] = Field(default_factory=list, description="Lista dei titoli di giochi o franchise menzionati nella news")
     case_editrici: List[str] = Field(description="Lista separata di ogni casa editrice o software house trovata.")
-
+    overview: str = Field(description="Un riassunto conciso di tutto ciò di cui si parla nel post, in modo da avere una panormaica COMPLETA del contenuto")

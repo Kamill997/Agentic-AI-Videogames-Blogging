@@ -10,7 +10,6 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from tools.tavily_search_tool import tavily_search_tool
 
 
-
 tools=[tavily_search_tool,get_planning_context_tool,check_game_already_reviewed_tool]
 tools_by_name = {tool.name: tool for tool in tools}
 llm_with_tools = llm_x.bind_tools(tools,parallel_tool_calls=False)
@@ -70,6 +69,7 @@ def research_node(state: PlanningState):
 
 tool_node_planning = ToolNode(tools, messages_key="planning_messages")
 
+
 def route_after_research(state: PlanningState):
     last_message = state["planning_messages"][-1]
     
@@ -83,7 +83,7 @@ def hitl_planning_node(state: PlanningState) -> Command:
     azione = state.get("next_action")
     
     # ==========================================
-    # CASO 1: Azione a vuoto / Informativa (Nessuna UI, fine diretta)
+    # CASO 1: Azione a vuoto / Informativa (chiede di eliminare un piano o di andare avanti ma non esiste il piano)
     # ==========================================
     if azione == "SHOW_MESSAGE":
         messaggio= state.get("message", "Non è presente nessun plunning")    
@@ -108,7 +108,7 @@ def hitl_planning_node(state: PlanningState) -> Command:
         )
         
     # ==========================================
-    # CASO 2: Revisione della Bozza (Dopo DO_RESEARCH)
+    #  Revisione della Bozza (Dopo DO_RESEARCH)
     # ==========================================
 
     elif azione == "DO_RESEARCH":
@@ -125,7 +125,7 @@ def hitl_planning_node(state: PlanningState) -> Command:
                 "allow_respond": False,
                 "allow_edit": True,
             },
-            "description": f"### Bozza da inserire in Neo4j:\n\n```json\n{bozza_attuale}\n```",
+            "description": f"### Pianificazione del piano editoriale:\n\n```json\n{bozza_attuale}\n```",
         }
         
         response = interrupt([request])[0]
@@ -145,9 +145,10 @@ def hitl_planning_node(state: PlanningState) -> Command:
     # CASO 3: Richiesta di interazione "Vuoi prima eliminarlo?"
     # ==========================================
     elif azione == "INTERACTION":
-
-        messaggio = state.get("message", "È presente un plunning esistente. Vuoi eliminare il piano esistente?")
-        
+        piano_attuale = state.get("active_plan")
+        messaggio = (f"È presente un planning esistente:\n"
+                f"--- PIANO ATTUALE ---\n{piano_attuale}\n---------------------\n"
+                "Vuoi eliminare il piano esistente?")        
         request = {
             "action_request": {
                 "action": "Plunning esistente, vuoi sovrasciverlo?",
@@ -159,7 +160,7 @@ def hitl_planning_node(state: PlanningState) -> Command:
                 "allow_respond": False,  
                 "allow_edit": False
             },
-            "description": f"### {messaggio}",
+            "description": f"{messaggio}",
         }
         
         response = interrupt([request])[0]
@@ -175,6 +176,7 @@ def hitl_planning_node(state: PlanningState) -> Command:
         
         else: 
             return Command(goto=END, update={"next_action": "FINISCI"})
+        
     return Command(goto=END, update={"next_action": "FINISCI"})
 
   
