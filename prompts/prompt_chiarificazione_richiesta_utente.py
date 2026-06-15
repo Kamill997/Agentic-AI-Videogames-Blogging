@@ -8,8 +8,8 @@ clarify_review_instructions = """
 
   CRITERI DI APPROVAZIONE (need_clarification = false)
   Approva SEMPRE se il gioco è chiaramente identificabile, ovvero:
-  - È una serie accompagnata da un capitolo specifico (es. "Assassin’s Creed Origins", "COD Modern Warfare 2").
-  - Il titolo è chiaro anche se manca la piattaforma o la versione  (es. "It Takes Two", "Elden Ring").
+  - La richiesta richiede una recensione di una serie accompagnata da un capitolo specifico (es. "Assassin’s Creed Origins", "COD Modern Warfare 2").
+  - La richiesta richiede una recensioned ed è accompagnata dal titolo anche se manca la piattaforma o la versione o non lo conosci (es. "It Takes Two", "Elden Ring").
 
   CRITERI DI CHIARIMENTO (need_clarification = true)
   Richiedi un chiarimento SOLO ED ESCLUSIVAMENTE nei seguenti casi:

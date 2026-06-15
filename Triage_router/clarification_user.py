@@ -1,13 +1,13 @@
+import json
 from langgraph.graph import END
 from State_tameplate import TriageState, ClarifyWithUser, ResearchQuestion
 from prompts.prompt_chiarificazione_richiesta_utente import clarify_news_instructions,clarify_review_instructions,transform_messages_into_research_topic_prompt
-from langchain_core.messages import HumanMessage, AIMessage, get_buffer_string
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, get_buffer_string
 from langgraph.types import Command
 from typing import Literal
 from langgraph.types import interrupt, Command
 from State_tameplate import llm_p
-from neo4j_connection import neo4j_driver
-
+from tools.neo4j_tool import check_game_already_reviewed_tool,check_news_already_published_tool
 
 def clarify_and_write_brief(state: TriageState) -> Command[Literal["clarify_and_write_brief", END]]:
     """
@@ -33,47 +33,62 @@ def clarify_and_write_brief(state: TriageState) -> Command[Literal["clarify_and_
     if response_clarify.need_clarification:
         user_answer = interrupt(response_clarify.question)
         
-        return Command(goto="clarify_and_write_brief",  update={"triage_messages": [AIMessage(content=response_clarify.question),HumanMessage(content=str(user_answer))]})
+        return Command(
+            goto="clarify_and_write_brief",  
+            update={"triage_messages": [AIMessage(content=response_clarify.question), HumanMessage(content=str(user_answer))]}
+        )
 
     structured_brief_model = llm_p.with_structured_output(ResearchQuestion)
-    response_brief = structured_brief_model.invoke([HumanMessage(content=transform_messages_into_research_topic_prompt.format(messages=get_buffer_string(triage_messages)))])
+    prompt_query = transform_messages_into_research_topic_prompt.format(messages=get_buffer_string(triage_messages))
+    response_brief = structured_brief_model.invoke([HumanMessage(content=prompt_query)])
     
-    post_trovati = cerca_post_per_parola(response_brief.game_name, classification)
+    tool_result = {"is_duplicate": False, "message": "Nessun controllo eseguito", "data": []}
     
-    if post_trovati:
-        lista_formattata = "\n".join([f"**{p['title']}** (Categoria: {p['tipo']})\n *Overview:* {p['overview']}" for p in post_trovati])
+    if classification == "Review":
+        tool_result = check_game_already_reviewed_tool.invoke({"game_name": response_brief.game_name})
+    elif classification == "News":
+        tool_result = check_news_already_published_tool.invoke({"argomento": response_brief.game_name})
+    
+    if tool_result.get("is_duplicate") == True:
+        
+        records = tool_result.get("data", [])
+        segnalazioni_match = []
+        
+        for i, doc in enumerate(records, 1):
+            titolo_doc = doc.get("titolo", "Titolo non disponibile")
+            overview_doc = doc.get("overview", "Nessun abstract o riassunto presente")
+
+            blocco = (
+                f"Match #{i}: {titolo_doc}**\n"
+                f"> *Abstract/Overview:* {overview_doc}\n"
+                f"---"
+            )
+            segnalazioni_match.append(blocco)
+            
+        messaggio_match = "\n".join(segnalazioni_match)
+    
         request = {
             "action_request": {
                 "action": "Verifica Duplicati", 
-                "args": {"trovati": post_trovati}
+                "args": {
+                    "risultato_database": tool_result 
+                }
             },
             "config": {
                 "allow_accept": True, 
                 "allow_ignore": True
             },
             "description": (
-                f" Ho trovato dei contenuti esistenti per {response_brief.game_name}:\n\n"
-                f"{lista_formattata}\n\n"
-                "Vuoi procedere con la creazione di un nuovo post o annullare?"
+                f"**ATTENZIONE: {tool_result['message'].upper()}**\n\n"
+                f"Il sistema ha rilevato i seguenti contenuti simili già presenti nel database:\n\n"
+                f"{messaggio_match}\n\n"
+                f"Vuoi procedere comunque con la creazione del nuovo post o preferisci annullare?"
             ),
         }
+            
+        risposta = interrupt([request])[0] 
         
-        risposta = interrupt([request])[0]
-        if risposta["type"] == "ignore":
+        if risposta.get("type") == "ignore":
             return Command(goto=END, update={"classification_decision": "Ignore"})
+        
     return Command(goto=END, update={"query": response_brief.research_brief})
-
-def cerca_post_per_parola(parola: str, tipo_post: str):
-    """
-    Cerca post filtrando per tipo (News o Review) e per parola chiave .
-    """
-    query = """
-    MATCH (p:Post {tipo_post: $tipo})
-    WHERE toLower(p.titolo) =~ '.*' + toLower(replace($parola, ' ', '.*')) + '.*'
-       OR toLower(p.overview) =~ '.*' + toLower(replace($parola, ' ', '.*')) + '.*'
-       OR toLower(p.content) =~ '.*' + toLower(replace($parola, ' ', '.*')) + '.*'   
-    RETURN p.titolo AS title, p.tipo_post AS tipo, p.overview AS overview
-    """
-    with neo4j_driver.session() as session:
-        result = session.run(query, {"parola": parola, "tipo": tipo_post})
-        return [record.data() for record in result]

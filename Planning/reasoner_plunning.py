@@ -5,12 +5,12 @@ from typing_extensions import Literal
 from langgraph.graph import END
 from State_tameplate import PlanningState,llm_x,PlanningCommand
 from prompts.prompt_planner import prompt_planner,research_agent_prompt
-from tools.neo4j_tool import check_active_plan_tool,get_planning_context_tool,check_game_already_reviewed_tool
+from tools.neo4j_tool import check_active_plan_tool,get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from tools.tavily_search_tool import tavily_search_tool
 
 
-tools=[tavily_search_tool,get_planning_context_tool,check_game_already_reviewed_tool]
+tools=[tavily_search_tool,get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool]
 tools_by_name = {tool.name: tool for tool in tools}
 llm_with_tools = llm_x.bind_tools(tools,parallel_tool_calls=False)
 
@@ -125,7 +125,7 @@ def hitl_planning_node(state: PlanningState) -> Command:
                 "allow_respond": False,
                 "allow_edit": True,
             },
-            "description": f"### Pianificazione del piano editoriale:\n\n```json\n{bozza_attuale}\n```",
+            "description": f"Pianificazione del piano editoriale:\n\n{bozza_attuale}\n",
         }
         
         response = interrupt([request])[0]

@@ -33,8 +33,8 @@ def executor_node(state: PlanningState):
                     return Command(
                         goto=END, 
                         update={
-                            "query": query_corrente,       # Inietta la query per il triage
-                            "next_action": "VAI_AL_TRIAGE", # Segnale per il Grafo Padre
+                            "query": query_corrente,      
+                            "next_action": "VAI_AL_TRIAGE", 
                             "planning_messages": [AIMessage(content=f"POP Eseguita. Task estratto: '{query_corrente}'.")]
                         }
                     )
