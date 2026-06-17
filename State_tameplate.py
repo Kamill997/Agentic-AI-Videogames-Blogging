@@ -110,3 +110,17 @@ class InfoPostNews(BaseModel): #usato per estrarre info per aggiungere il nodo n
     titoli_interessati: List[str] = Field(default_factory=list, description="Lista dei titoli di giochi o franchise menzionati nella news")
     case_editrici: List[str] = Field(description="Lista separata di ogni casa editrice o software house trovata.")
     overview: str = Field(description="Un riassunto conciso di tutto ciò di cui si parla nel post, in modo da avere una panormaica COMPLETA del contenuto")
+
+class RisoluzioneGioco(BaseModel):
+
+    appid: Optional[int] = Field(
+        default=None, 
+        description="L'AppID numerico di Steam del gioco scelto. Impostare a None se id_trovato è False."
+    )
+    nome_ufficiale_steam: Optional[str] = Field(
+        default=None, 
+        description="Il nome esatto del gioco così come appare nella lista di Steam. Impostare a None se id_trovato è False."
+    )
+    motivazione: str = Field(
+        description="Spiega brevemente perché hai scelto questo specifico ID o perché ritieni che il gioco non sia presente."
+    )

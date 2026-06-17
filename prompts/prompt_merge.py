@@ -26,43 +26,41 @@ REGOLE:
 * NON DEVI ESSERE RIPETITIVO, evita di ripetere lo stesso concetto con parole diverse.
 
 STRUTTURA RECENSIONE OBBLIGATORIA E TASSATIVA:
-La recensione DEVE essere strutturata PER PARAGRAFI (con titolo) in maniera discorsiva:
-- Intro (in cui si dice il titolo,il genere(sparatutto, strategico, simulatore di guida, avventura,ecc) la data di uscita, piattafrome su cui è disponibile, casa editrice, contesto  di uscita se rilevante ed altre info)
-- Introduzione al contesto narrativo, al personaggio principale, alla storia, all'ambientazione (spazio, antico egitto, futuristico) con frasi ad effetto che portano al continuo della lettura della recensione. Trama e incipit della storia (senza spoiler):racconta lo scopo del protagonista e su cosa si concentra la trama
-- Gameplay DETTAGLIATO (non riportare nessuna informazione su altri elementi come grafica, audio, prestazioni, ecc in questa sezione, che deve essere focalizzata SOLO sul gameplay)
+SE IL GIOCO NON è USCITO NON FARE LA RECENSIONE.
+La recensione DEVE essere strutturata PER PARAGRAFI (con titolo) in maniera discorsiva con paragrafi ricchi di informazioni:
+1) Intro (in cui si dice il titolo,il genere(sparatutto, strategico, simulatore di guida, avventura,ecc) la data di uscita, piattafrome su cui è disponibile, casa editrice, contesto  di uscita se rilevante ed altre info)
+2) Introduzione al contesto narrativo, al personaggio principale, alla storia, all'ambientazione (spazio, antico egitto, futuristico) con frasi ad effetto che portano al continuo della lettura della recensione. Trama e incipit della storia (senza spoiler):racconta lo scopo del protagonista e su cosa si concentra la trama
+3) Gameplay DETTAGLIATO (non riportare nessuna informazione su altri elementi come grafica, audio, prestazioni, ecc in questa sezione, che deve essere focalizzata SOLO sul gameplay)
    * informazioni relative al gameplay, ossia cosa si fa, se si guida, si spara, se si combatte ecc
    * Struttura di gioco (open world, mission based, roguelike, survival, immersive sim, souls like ecc.)
    * esplorazione 
-   * multiplayer/single player
+   * SE presenta il multiplayer
    * meccaniche di gioco
    * Ruoli e classi se presenti
-- Grafica, direzione artistica e Audio
-- Prestazioni
-- Punti di forza e difetti
-- Presenza di DLC o contenuti aggiuntivi (riportare il titolo e le informazioni sui  DLC SE PRESENTI, se è un DLC OVVIAMENTE NON PARLARE DI QUESTO CAMPO). SE NON PRESENTI DI SOLAMENTE CHE NON SONO PRESENTI DLC
-- Voto *METTILO ESCLUSIVAMENTE se presente IN QUALCHE RECENSIONE originale, altrimenti omettilo completamente*
-
 La sezione gameplay DEVE descrivere:
 Gameplay principale (meccaniche di gameplay, ad es combattimento a turni, possibilità di uso di superpoteri, tipologia di armi ecc)
 cosa fa concretamente il giocatore 
 Meccanica distintiva del gioco (il personaggio si arrambica sui muri? Il gioco è basato su scelte morali? Il gioco ha un sistema di crafting complesso? ecc.)
+4) Grafica, direzione artistica e Audio
+5) Punti di forza e difetti
+6) Presenza di DLC o contenuti aggiuntivi (riportare il titolo e le informazioni sui  DLC SE PRESENTI, se è un DLC OVVIAMENTE NON PARLARE DI QUESTO CAMPO).
+SEZIONI NON OBBLIGATORIO, SE NON PRESENTI NON INDICARE COMPLETAMENTE IL CAMPO E NON INVENTARLE:
+**REGOLE FONDAMENTALI
+7) SOLAMENTE NEL CASO IN CUI HAI INFORMAZIONI UTILI E CORETTE (IL NOME DEL GIOCO RILEVATO DEVE ESSERE GIUSTO) SULLE RECENSIONE DEGLI UTENTI DI STEAM ARRICCHISI IL PUNTO "5)Punti di forza e difetti" CON I PRO ED I CONTRO RISCONTRATI DAGLI UTENTI MA RIELABORATI DA TE FORNENDO ANCHE IL PUNTEGGIO DI STEAM. NON CREARE UN NUOVO CAMPO USA IL PUNTO 5
+8) SOLAMENTE SE HAI INFORMAZIONI UTILI E CORRETTE (IL NOME DEL GIOCO RILEVATO DEVE ESSERE GIUSTO) SUL PREZZO EFFETTIVO DEL GIOCO SU STEAM INDICALO OBBLIGATOIRAMENTE COMMENTANDOLO, ALTRIMENTI NON INDICARE ASSOLUTAMENTE QUESTO CAMPO
+9) SOLAMENTE SE HAI INFORMAZIONI UTILI E CORRETTE (IL NOME DEL GIOCO RILEVATO DEVE ESSERE GIUSTO) SUL NUMERO DI GIOCATORI SU STEAM INDICALO E FAI UN COMMENTO.
+10) SOLAMENTE SE HAI IL Voto METTILO ALTRIMENTI OMETTI LO COMPLETAMENTE
 
 STILE:
 * Tono editoriale moderno (IGN/GameSpot).
-* Frasi compatte e ad alta densità informativa.
-* Evita enfasi inutili e aggettivi ripetuti.
+* Non essere riassuntivo ma nemmeno ripetitivo
+* RIPORTA TUTTE LE INFORMAZIONI CHE HAI
 * Non ripetere gli stessi concetti con parole diverse.
-* Preferisci paragrafi brevi e concreti.
-* Alla fine indicare SOLO se presente il voto
-  Voto: X/ voto SOLO SE PRESENTE, ALTRIMENTI NON DEVI ASSOLLUTAMENTE SCRIVERLO
-REGOLE SUL VOTO:
-* Inserisci il voto SOLO ed ESCLUSIVAMENTE se presente nelle informazioni ricevute.
-* Se assente, ometti OBBLIGATORIAMENTE la sezione  Voto: X/ voto
 
 SONO BANDITE frasi verbose del tipo (o versioni simili):
 - gameplay con loop di esplorazione e combattimento.
 - il giocatore progredisce completando missioni
-- il giocatore sconfigge nemici
+- il giocatore sconfigge nemici,superare ostacoli
 - Il gioco ha una struttura di gioco linear
 - il giocatore deve superare sfide per progredire nel gioco
 EVITA DI USARE "il giocatore" o "il gioco" in modo generico, cerca di essere specifico su cosa si fa concretamente nel gioco senza usare frasi generiche e ovvie.

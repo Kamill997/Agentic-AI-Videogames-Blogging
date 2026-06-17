@@ -5,9 +5,10 @@ from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage, fi
 from prompts.prompt_scelta_tool import research_agent_prompt_review,research_agent_prompt_News
 from tools.tavily_search_tool import tavily_search_tool
 from tools.RAG_tool import RAG_tool
+from tools.steam_tool import recensioni_utenti_steam,ottieni_prezzo_gioco
 
-tools=[tavily_search_tool,RAG_tool]
-tools_by_name = {tool.name: tool for tool in tools}
+
+tools=[tavily_search_tool,RAG_tool,recensioni_utenti_steam,ottieni_prezzo_gioco]
 llm_with_tools = llm_p.bind_tools(tools,parallel_tool_calls=False)
 
 def llm_call(state: AgentState):
@@ -24,7 +25,7 @@ Il modello analizza lo stato attuale della conversazione e decide se:
     if state["classification_decision"] == "News":
         system_prompt = research_agent_prompt_News.format(data=data_di_oggi,richiesta=richiesta_utente)
     else:
-        system_prompt = research_agent_prompt_review.format(richiesta=richiesta_utente)
+        system_prompt = research_agent_prompt_review.format(richiesta=richiesta_utente,data=data_di_oggi)
 
     invoke_messages = [SystemMessage(content=system_prompt)] + messages
 

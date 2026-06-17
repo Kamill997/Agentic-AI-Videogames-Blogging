@@ -7,13 +7,13 @@ clarify_review_instructions = """
   </Messages>
 
   CRITERI DI APPROVAZIONE (need_clarification = false)
-  Approva SEMPRE se il gioco è chiaramente identificabile, ovvero:
+  Approva SEMPRE se il gioco è  identificabile, ovvero:
   - La richiesta richiede una recensione di una serie accompagnata da un capitolo specifico (es. "Assassin’s Creed Origins", "COD Modern Warfare 2").
-  - La richiesta richiede una recensioned ed è accompagnata dal titolo anche se manca la piattaforma o la versione o non lo conosci (es. "It Takes Two", "Elden Ring").
+  - La richiesta richiede una recensioned ed è accompagnata dal titolo anche se manca la piattaforma o la versione o non lo conosci (es. "recensione It Takes Two", "Recensione di Elden Ring","Recensione di split fiction").
 
   CRITERI DI CHIARIMENTO (need_clarification = true)
   Richiedi un chiarimento SOLO ED ESCLUSIVAMENTE nei seguenti casi:
-  1. Il testo è una richiesta generica ambigua (es. "voglio una recensione", "parlami di un gioco per PS5","recensione gioco").
+  1. Il testo è una richiesta generica ambigua che richiede solo una recensione o una news senza specificare l'argomento (es. "voglio una recensione", "parlami di un gioco per PS5","recensione gioco").
 
   REGOLE TASSATIVE PER LA DOMANDA DI CHIARIMENTO:
   - NON RIPETERE MAI LA STESSA DOMANDA O DOMANDE SIMILI

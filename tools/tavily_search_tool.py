@@ -9,7 +9,7 @@ def tavily_search_tool(query:str,ragionamento: str)->str:
         query: Le parole chiave reali da cercare su internet in ITALIANO.
         ragionamento: DEVI TASSATIVAMENTE scrivere un nuovo pensiero aggiornato OGNI VOLTA che chiami il tool, spiegando il perchè è stato invocato il tool
     """
-    result=tavily_client.search(query,include_images=False, max_results=1,exclude_domains=["reddit.com","Instagram.com", "youtube.com","facebook.com","ebay.com","tiktok.com"])
+    result=tavily_client.search(query,include_images=False, max_results=1,exclude_domains=["reddit.com","Instagram.com", "youtube.com","facebook.com","ebay.com","tiktok.com","www.dailymotion.com"])
     # Format output for consumption
     return result
 

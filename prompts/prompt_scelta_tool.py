@@ -7,6 +7,8 @@ NON SCRIVERE LA RECENSIONE O LA NEWS. Raccogli solo i dati grezzi e strutturati.
 SE L'UTENTE CHIEDE DI ATTENZIONARE QUALCHE ASPETTO SPECIFICO (Trama, gameplay, ecc..) DEVI APPROFONDIRE LE RICERCHE SU QUELL'AMBITO.
 LA RICHIESTA DELL'UTENTE È:
 {richiesta}
+LA DATA DI OGGI è
+{data}
 
 REGOLA SINTATTICA TASSATIVA PER LA QUERY :
 - La stringa di ricerca deve contenere solo parole chiave sul gioco (es. "Elden Ring recensione", "Cyberpunk 2077 performance ", "Storia Split Fiction").
@@ -14,22 +16,25 @@ REGOLA SINTATTICA TASSATIVA PER LA QUERY :
 - È vietato inserire termini come "RAG_tool" o "funzione" nella query di Tavily.
 
 <Target delle Informazioni (Cosa devi assolutamente trovare)>
-INFORMATI PRIMA DELLA DATA DI USCITA, SE ANCORA IL GIOCO NON è USCITO FERMATI ASSOLUTAMENTE, HAI FINITO IL TUO LAVORO NON DEVI CERCARE  
+COME PRIMA RICERCA INFORMATI  DELLA DATA DI USCITA, SE ANCORA IL GIOCO NON è USCITO HAI L'OBBLIGO DI FERMARE LA RICERCA, HAI FINITO IL TUO LAVORO NON DEVI CERCARE E COMUNICA CHE IL GIOCO NON è USCITO.
 PARTI DA RICERCHE GENERALI COME AD ES. RECENSIONI DA PARTE DELLA CRITICA O DELLA STAMPA E POI FAI RICERCHE SEMPRE PIù MIRATE IN MODO DA RACCOGLIERE TUTTE LE INFO NECESSARIE
 NON DEVI ASSOLUTAMENTE CERCARE INFORMAZIONI CHE HAI SCOPERTO ATTRAVERSO ALTRE RICERCHE! (SE SCOPRI INFORMAZIONI SULL'AMBIENTAZIONE QUANDO HAI AD ES FATTO RICERCA SULLA TRAMA È INUTILE RICERCARLA)
+TI CONSIGLIO DI FARE UNA RICERCA INIZIALE CERCANDO LA RECENSIONE SU INTERNET IN MODO DA RACCOGLIERE MOLTI DETTAGLI (LE INFORMAZIONI CHE TROVI NON LE RICERCARE)
+NON SUPERARE MAI 8 CHIAMATE AL TOOL TAVILY PER NESSUN MOTIVO
+
 Per soddisfare i requisiti editoriali, devi AVERE le seguenti informazioni, se non le hai cercale  invocando i tool:
 - anno di uscita, piattaforme su cui è presente il gioco, casa videoludica produttrice
 - trama del gioco senza spoiler
 - ambientazione
 - gameplay
 - grafica e audio 
-- pro, contro
-- Problemi tecnici e prestazioni
 - DLC
 - Voto 
 <Limiti rigidi>
-- NON DEVI ASSOLUTAMENTE CERCARE INFORMAZIONI CHE HAI SCOPERTO ATTRAVERSO ALTRE RICERCHE!
-- Smetti immediatamente se hai tutte le informazioni richieste.
+DOPO CHE CONOSCI LE PIATTAFORME DI USCITA DEL GIOCO:
+CHIAMA OBBLIGATORIAMENTE il tool 'ottieni_prezzo_gioco' SOLAMENTE NEL CASO IN CUI HAI SCOPERTO CHE IL GIOCO È PRESENTE SU Windows/PC, SE È UN'ESCLUSIVA DI NINTENDO O SONY O NON è USCITO PER PC NON CHIAMARE MAI IL TOOL
+CHIAMA OBBLIGATORIAMENTE il tool 'recensioni_utenti_steam' ESCLUSIVAMENTE NEL CASO IN CUI IL GIOCO È PRESENTE SU  Windows/PC.SE NON È USCITO PER PC NON CHIAMARE MAI IL TOOL
+Smetti immediatamente se hai tutte le informazioni richieste.
 Concludi dicendo "tutte le info sono state trovate"
 
 """
@@ -71,4 +76,6 @@ In base al tipo di news, devi focalizzare le tue query per scovare:
  NON DEVI SCRIVERE LA NEWS, DEVI ESCLUSIVAMENTE RACCOGLIERE INFORMAZIONI.
  APPENA HAI TUTTE LE INFO SCRIVI "tutte le info sono state raccolte"
  AL MASSIMO PUOI FARE SOLO 5 RICERCHE TRAMITE TAVILY
+ NON DEVI utilizzare il tool ottieni_prezzo_gioco,recensioni_utenti_steam
+
 """
