@@ -1,8 +1,8 @@
 from typing import Literal
 from langgraph.types import Command
 from prompts.prompt_triage import triage_system_prompt, default_triage_instructions, default_background, triage_user_prompt
-from State_tameplate import ContentRouterSchema, TriageState
-from State_tameplate import llm
+from State_template import ContentRouterSchema, TriageState
+from State_template import llm
 from langgraph.graph import  END
 from langchain_core.messages import AIMessage,HumanMessage
 

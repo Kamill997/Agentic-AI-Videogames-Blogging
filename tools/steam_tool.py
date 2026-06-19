@@ -3,7 +3,7 @@ import re
 from langchain_core.tools import tool
 import json
 import requests
-from State_tameplate import RisoluzioneGioco,llm_p
+from State_template import RisoluzioneGioco,llm_p
 
 def clean_title(text: str) -> str:
     """
@@ -94,6 +94,7 @@ def estrai_recensioni(tipo_recensione: str, recensione_url: str) -> tuple:
 @tool
 def recensioni_utenti_steam(game_name: str, ragionamento: str) -> str:
     """
+    CHIAMA IL TOOL Solo se il gioco è uscito per PC
     Recupera le 3 recensioni utente più utili POSITIVE e NEGATIVE, 
     insieme al conteggio totale dei voti della community.
     ragionamento: DEVI TASSATIVAMENTE scrivere un nuovo pensiero aggiornato OGNI VOLTA che chiami il tool.
@@ -121,6 +122,7 @@ def recensioni_utenti_steam(game_name: str, ragionamento: str) -> str:
 @tool
 def ottieni_prezzo_gioco(game_name: str,ragionamento:str) -> str:
     """
+    CHIAMA IL TOOL Solo se il gioco è uscito per PC
     Recupera il prezzo attuale, l'eventuale percentuale di sconto e indica se il gioco 
     è attualmente gratuito (Free to Play) su Steam
     Usa questo tool per valutare il rapporto qualità/prezzo all'interno di una recensione.

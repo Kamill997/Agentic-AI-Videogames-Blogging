@@ -1,22 +1,27 @@
 from typing import Literal
 from langgraph.graph import END
-from State_tameplate import AgentState
+from State_template import AgentState
 from langchain_core.messages import HumanMessage, AIMessage
 from langgraph.types import Command, interrupt
 from prompts.prompt_rifinitura_bozza import prompt_rifinitura
-from State_tameplate import llm
-from add_node import create_post_node_in_neo4j
+from State_template import llm
 
 def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_post_node_in_neo4j","triage_unit"]]:
     """
-    Post-process the merged result for human-in-the-loop review.
-    This function can be used to format the final output, add any necessary
-    metadata, or prepare it for presentation to a human reviewer.
-    Args:
-        state (AgentState): The current state of the agent, which includes the merged result.
+    Elabora il risultato unito per la revisione umana.
+    Questa funzione può essere utilizzata per formattare l'output finale, aggiungere eventuali dati necessari
+    Argomenti:
+    state (AgentState): Lo stato corrente dell'agente, che include il risultato unito.
     """
     proposta = state.get("merge_result")
     decision = state.get("classification_decision")
+
+    warning_rag = state.get("fact_check_warning") # Recuperiamo il warning
+    descrizione_ui = f"### Bozza della Recensione/News corrente:\n\n{proposta}"
+    if warning_rag:
+        descrizione_ui = f"### {warning_rag}\n\n---\n\n" + descrizione_ui
+
+
     if decision in ["Review", "News"]:
         request = { 
             "action_request": {
@@ -29,7 +34,9 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
                 "allow_respond": True,  # Mantiene sotto il box di testo per scrivere modifiche
                 "allow_edit": True,    # Permette di modificare il testo prima di approvare
             },
-            "description": f"### Bozza della Recensione/News corrente:\n\n{proposta}",
+            #"description": f"### Bozza della Recensione/News corrente:\n\n{proposta}",
+            "description": descrizione_ui,
+
         }
         response = interrupt([request])[0]
         tipo_risposta = response["type"]
@@ -37,6 +44,7 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
         if tipo_risposta == "accept" :
             print(response)
             return Command(goto="create_post_node_in_neo4j", update={"merge_result": proposta})
+
         
         elif tipo_risposta == "ignore":
             return Command(goto=END)
@@ -79,8 +87,7 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
                 "allow_ignore": True,   # Crea il tasto "Ignore" (Rifiuta/Annulla)
                 "allow_edit": True,    # Permette di modificare il testo prima di approvare
             },
-            # Il testo della bozza apparirà nel corpo principale della pagina (Agent Inbox)
-            "description": f"### Suggerimento pubblicazione post:\n\n{proposta}",
+                "description": f"### Suggerimento pubblicazione post:\n\n{proposta}",
         }
         response = interrupt([request])[0]
         tipo_risposta = response["type"]

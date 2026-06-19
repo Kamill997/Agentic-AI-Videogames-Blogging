@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 from typing import List
 from langchain_core.messages import HumanMessage
 from neo4j_connection import neo4j_driver
-from State_tameplate import AgentState, llm_p, InfoPostReview, InfoPostNews
+from State_template import AgentState, llm_p, InfoPostReview, InfoPostNews
 from prompts.prompt_estrattore_info_neo4j import estrazione_features_review,estrazione_features_News
 
 
@@ -81,9 +81,9 @@ def create_review_post(session, post_data: InfoPostReview, content: str, data_po
         query,
         {
             "titolo": post_data.titolo,
-            "gioco": post_data.gioco,
-            "case_editrici": post_data.case_editrici,
-            "genere": post_data.genere,
+            "gioco": post_data.gioco.strip().title() if post_data.gioco else "Sconosciuto",
+            "case_editrici": [c.strip().title() for c in post_data.case_editrici if c and c.strip()],
+            "genere": [g.strip().title() for g in post_data.genere if g and g.strip()],
             "overview": post_data.overview, 
             "content": content,
             "data_post": data_post,
@@ -129,12 +129,13 @@ def create_news_post(session, post_data: InfoPostNews, content: str, data_post: 
         query,
         {
             "titolo": post_data.titolo,
-            "titoli_interessati": post_data.titoli_interessati or [],
-            "case_editrici": post_data.case_editrici or [],
+            "gioco": post_data.gioco.strip().title() if post_data.gioco else "Sconosciuto",
+            "case_editrici": [c.strip().title() for c in post_data.case_editrici if c and c.strip()],
+            "genere": [g.strip().title() for g in post_data.genere if g and g.strip()],
+            "overview": post_data.overview, 
             "content": content,
             "data_post": data_post,
-            "overview": post_data.overview, 
-            "links": links,
+            "links": links
         }
     )
     record = result.single()

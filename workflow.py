@@ -1,5 +1,5 @@
 from langgraph.graph import StateGraph, START, END
-from State_tameplate import AgentState, AgentInputState
+from State_template import AgentState, AgentInputState
 from reasoner import llm_call,tool_node,route_after_llm
 from merge_result import merge_result
 from hitl_post import hitl_post, refine_proposal
@@ -9,7 +9,7 @@ from add_node import create_post_node_in_neo4j
 from Planning.workflow_planning import compiled_planning_subgraph
 from Triage_router.triage_router import triage_router
 from Triage_router.workflow_triageRouter_clarifyRequest import TriageRouterClarify_subgraph
-
+from fact_checker import fact_check_node
 
 
 workflow = StateGraph(AgentState, input_schema=AgentInputState)
@@ -25,6 +25,8 @@ workflow.add_node("suggestion_subgraph", compiled_suggestion_subgraph )
 workflow.add_node("create_post_node_in_neo4j",create_post_node_in_neo4j)
 workflow.add_node("planning_subgraph",compiled_planning_subgraph)
 
+workflow.add_node("fact_check_node", fact_check_node) # NUOVO
+
 workflow.add_edge(START, "triage_unit")
 workflow.add_edge("triage_unit","router_after_triage")
 workflow.add_conditional_edges(
@@ -36,7 +38,8 @@ workflow.add_conditional_edges(
     }
 )
 workflow.add_edge("tools", "llm_call")
-workflow.add_edge("merge_result","hitl_post")
+workflow.add_edge("merge_result", "fact_check_node")
+workflow.add_edge("fact_check_node", "hitl_post")
 workflow.add_edge("suggestion_subgraph", "hitl_post")
 workflow.add_conditional_edges(
     "planning_subgraph",

@@ -2,7 +2,7 @@ from langchain_core.messages import AIMessage
 from langgraph.types import Command
 from langgraph.graph import END
 from neo4j_connection import neo4j_driver 
-from State_tameplate import PlanningState,PlanExtraction,llm_p
+from State_template import PlanningState,PlanExtraction,llm_p
 from prompts.prompt_planner import prompt_estrazione
 
 def executor_node(state: PlanningState):

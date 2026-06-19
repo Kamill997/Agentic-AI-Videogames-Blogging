@@ -3,7 +3,6 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 
 load_dotenv()
-
 URI = os.getenv("NEO4J_URI")
 AUTH = (os.getenv("NEO4J_USERNAME"), os.getenv("NEO4J_PASSWORD"))
 
@@ -22,5 +21,5 @@ class Neo4jConnectionManager:
                 cls._driver = None
         return cls._driver
 
-# Questa riga espone la connessione pronta per gli altri file
 neo4j_driver = Neo4jConnectionManager.get_driver()
+

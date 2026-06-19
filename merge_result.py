@@ -1,5 +1,5 @@
 import json
-from State_tameplate import AgentState, llm_x
+from State_template import AgentState, llm_x
 from langchain_core.messages import HumanMessage, ToolMessage
 from prompts.prompt_merge import summarize_webpage_gameReview, summarize_webpage_news
 

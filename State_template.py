@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Annotated, List, TypedDict
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
@@ -7,22 +6,23 @@ from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from typing_extensions import Optional
 from langgraph.graph import MessagesState
-from langgraph.graph.message import BaseMessage, add_messages
+from langgraph.graph.message import add_messages
 from pydantic import BaseModel, Field
 import os
 from tavily import TavilyClient
 
 load_dotenv() 
-if not os.environ.get("OPENAI_API_KEY"):
-    print("Attenzione: OPENAI_API_KEY non trovata nel file .env!")
+
 if not os.environ.get("TAVILY_API_KEY"):
     print("Attenzione: TAVILY_API_KEY non trovata nel file .env!")
+if not os.environ.get("GROQ_API_KEY"):
+    print("Attenzione: GROQ_API_KEY non trovata nel file .env!")
 
+tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 llm_p = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
 llm = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
 llm_x=init_chat_model("groq:openai/gpt-oss-120b", temperature=0)
 
-tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 
 class AgentInputState(TypedDict):
     """Input state for the full agent - only contains messages from user input."""
@@ -41,7 +41,9 @@ class AgentState(MessagesState): #Stato principale
     merge_result: str #Risultato finale dopo merge
     user_feedback: Optional[str] #Feedback testuale dell'utente (se fornito)
     link_source: List[str] # link estratti da Tavily nel nodo merge
-        
+    fact_check_warning: Optional[str] # Avvisi per discrepanze trovate
+    game_name_for_rag: Optional[str]
+
 class TriageState(MessagesState): #stato del sottografo del triage 
     query: str #Query 
     classification_decision: Literal["Review", "News", "Suggestion","Planning"] #classificazione
@@ -124,3 +126,11 @@ class RisoluzioneGioco(BaseModel):
     motivazione: str = Field(
         description="Spiega brevemente perché hai scelto questo specifico ID o perché ritieni che il gioco non sia presente."
     )
+
+class FactCheckResult(BaseModel):
+        discrepancies: str = Field(
+            description="Descrivi in modo specifico i dati (numeri, nomi, date) presenti nella bozza che NON sono supportati dalle fonti o sono contraddittori. Se non ce ne sono, scrivi 'Nessuna'."
+        )
+        has_conflicts: Literal["si", "no"] = Field(
+            description="Scrivi 'si' se la bozza contiene informazioni inventate o errate rispetto alle fonti, altrimenti 'no'."
+        )

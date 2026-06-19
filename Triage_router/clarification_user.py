@@ -1,12 +1,12 @@
 import json
 from langgraph.graph import END
-from State_tameplate import TriageState, ClarifyWithUser, ResearchQuestion
+from State_template import TriageState, ClarifyWithUser, ResearchQuestion
 from prompts.prompt_chiarificazione_richiesta_utente import clarify_news_instructions,clarify_review_instructions,transform_messages_into_research_topic_prompt
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, get_buffer_string
 from langgraph.types import Command
 from typing import Literal
 from langgraph.types import interrupt, Command
-from State_tameplate import llm_p
+from State_template import llm_p
 from tools.neo4j_tool import check_game_already_reviewed_tool,check_news_already_published_tool
 
 def clarify_and_write_brief(state: TriageState) -> Command[Literal["clarify_and_write_brief", END]]:

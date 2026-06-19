@@ -1,5 +1,5 @@
 from langgraph.graph import StateGraph, START, END
-from State_tameplate import TriageState
+from State_template import TriageState
 from Triage_router.triage_router import triage_router
 from Triage_router.clarification_user import clarify_and_write_brief
 

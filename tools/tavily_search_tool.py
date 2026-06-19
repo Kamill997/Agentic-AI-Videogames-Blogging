@@ -1,4 +1,4 @@
-from State_tameplate import tavily_client
+from State_template import tavily_client
 from langchain_core.tools import tool
 
 @tool

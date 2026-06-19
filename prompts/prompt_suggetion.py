@@ -40,18 +40,19 @@ Esegui questo ciclo di validazione invocando il tool di ricerca web:
    - PER LE RECENSIONI usa query di scoperta sui videogiochi in questa fase, focalizzandoti sul genere carente individuato (es. "videogiochi che vale la pensa giocare", "videogiochi classici da giocare"), non ti interessa sapere la recensione ma solo il gioco. È DI FONDAMENTALE IMPORTANZA CHE PER LA RECENSIONE IL GIOCO SIA GIÀ USCITO. NON CERCARE "Videogiochi in uscita a Giugno" o "Videogiochi in uscita nel 2026". Assicurati che il Videogiochi scoperto sia già uscito sul mercato.
    - PER GLI EVENTI/NEWS: LA NEWS DEVE ESSERE RELATIVA SOLO AD UNA NOTIZIA (NO: News uscita god of war e tomb raider. SI: News Uscita Tomb radier. SI: Uscita god of war). Ti basta il nome dell'evento o il focus della notizia, e verifica che la NEWS NON SIA PIU VECCHIA DI 4 GIORNI rispetto a {data}. SE LA NEWS è VECCHIA DI 4 GIORNI SCARTALA ASSOLUTAMENTE E CONTINUA A CERCARE.
 
-2. Una volta fatta la ricerca generica (SOLO PER LE RECENSIONI):
+SOLO PER LE RECENSIONI:
+Una volta fatta la ricerca generica:
    - DEVI EFFETTUARE RICERCHE GENERALI SUI VIDEOGIOCHI OTTENUTI IN MODO DI AVERE UN'IDEA SICURA DI OGNI SINGOLO VIDEOGIOCO. (SE OTTIENI 4 VIDEOGIOCHI, FAI RICERCHE GENERALI SEPARATE SU TUTTI I VIDEOGIOCHI IN MODO DA AVERE MAGGIORI INFORMAZIONI)
-   - DEVI ASSOLUTAMENTE VERIFICARE LA DATA DELLA NEWS E DELLE INFORMAZIONI RIPORTATE, SE LA NEWS è VECCHIA SCARTALA E CERCA ANCORA.
-3. STOP ALLE RICERCHE DI DETTAGLIO: Appena individui un argomento valido per prendere la decisione, FERMATI. NON cercare informazioni aggiuntive come sviluppatore, piattaforme o trama.
+   - DEVI ASSOLUTAMENTE ESSERE SICURO CHE IL GIOCO CHE HAI SCELTO SIA USCITO QUINDI CERCA TRAMITE TAVILY LA DATA DI USCITA SE è USCITO BENE ALTRIMENTI SCARTALO
+2. STOP ALLE RICERCHE DI DETTAGLIO: Appena individui un argomento valido per prendere la decisione, FERMATI. NON cercare informazioni aggiuntive come sviluppatore, piattaforme o trama.
    - PER LE RECENSIONI: Ti basta solo il nome del gioco, il genere e la data di uscita (CHE DEVE ESSERE PRECEDENTE ALLA DATA ATTUALE, ALTRIMENTI SCARTALO E CONTINUA A CERCARE).
-4. Verifica dello Storico (Accetta / Scarta):
+3. Verifica dello Storico (Accetta / Scarta):
    - PER LE RECENSIONI: Confronta il titolo ed il genere del gioco scelto con i dati di Neo4j utilizzando il tool check_game_already_reviewed_tool. Se è già stato recensito di recente o è presente una recensione recente su un gioco diverso ma stesso genere SCARTALO e fai una nuova ricerca esplorativa. Se è nuovo e bilancia il blog, ACCETTALO. NON IMPORTA SE è UN GIOCO MOLTO RECENSITO SU INTERNET, L'IMPORTANTE CHE NON è TRATTATO NEL MIO BLOG
    - PER LE NEWS: Controlla se la stessa IDENTICA notizia o evento è già nello storico invocado il tool check_news_already_published_tool. Se c'è già, SCARTALA. Se non c'è, ACCETTALA a prescindere dal gioco o genere trattato. SE è PRESENTE LA NOTIZIA IN UN ALTRO POST MA IL POST NON è DEDICATO A QUELL'INFORMAZIONE USALA
 NON SCARTARE UN GIOCO SOLO PERCHè è UN GIOCO STORICO SUPER GETTONATO, L'IMPORTANTE È CHE NON SIA STATO RECENSITO NEL NOSTRO BLOG, NON MI INTERESSA SE SU INTERNET è MOLTO RECENSITO
 
 DEVI GENERARE UN PENSIERO CHE MOSTRI:
-**3. Processo di Ricerca e Scarto:**
+**4. Processo di Ricerca e Scarto:**
 [Racconta brevemente le ricerche esplorative che hai fatto tramite i tool per scoprire la notizia o il gioco e MOSTRA TUTTI I candidati CHE hai scartato (ANCHE SE NON LI HAI TENUTI IN CONSIDERAZIONE)].
 
 [FASE 3: REPORT FINALE E QUERY]

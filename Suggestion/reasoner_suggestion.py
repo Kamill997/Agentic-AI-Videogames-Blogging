@@ -2,7 +2,7 @@ from datetime import datetime
 import re
 from langgraph.graph import END
 from langgraph.prebuilt import ToolNode
-from State_tameplate import StateSuggestion,llm_x
+from State_template import StateSuggestion,llm_x
 from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 from prompts.prompt_suggetion import research_agent_prompt_suggestion
 from tools.tavily_search_tool import tavily_search_tool
