@@ -102,30 +102,31 @@ class ResearchQuestion(BaseModel): #uscite del write_research_brief
 
 class InfoPostReview(BaseModel): #usato per estrarre info per aggiungere il nodo review 
     titolo: str = Field(description="Un titolo estratto o generato per il post MA che permetta di capire che è una recensione il gioco che si sta recensendo")
-    gioco: str = Field(description="Il nome del videogioco principale recensito")
+    gioco: str = Field(description="Il nome del videogioco principale recensito.") # Torna stringa semplice
+    giochi_menzionati: List[GiocoInfo] = Field(default_factory=list, description="Lista di ALTRI videogiochi citati nel testo.")
     case_editrici: List[str] = Field(description="Lista separata di ogni casa editrice o software house trovata.")
     genere: List[str] = Field(default=[],description="Lista dei generi del gioco. REGOLA TASSATIVA: Separa SEMPRE i generi composti in elementi singoli. Es: se il testo dice 'Action-Avventura' o 'Action/RPG', tu devi restituire ['Action', 'Avventura'] o ['Action', 'RPG']. Usa l'iniziale maiuscola.")
     overview: str = Field(description="Un riassunto conciso di tutto ciò di cui si parla nel post, in modo da avere una panormaica COMPLETA del contenuto")
 
 class InfoPostNews(BaseModel): #usato per estrarre info per aggiungere il nodo news
     titolo: str = Field(description="Un titolo estratto o generato per il post")
-    titoli_interessati: List[str] = Field(default_factory=list, description="Lista dei titoli di giochi o franchise menzionati nella news")
+    titoli_interessati:List[GiocoInfo] = Field(default_factory=list, description="Lista dei titoli di giochi o franchise menzionati nella news, specificando per ciascuno se è già uscito o meno.")
     case_editrici: List[str] = Field(description="Lista separata di ogni casa editrice o software house trovata.")
     overview: str = Field(description="Un riassunto conciso di tutto ciò di cui si parla nel post, in modo da avere una panormaica COMPLETA del contenuto")
 
-class RisoluzioneGioco(BaseModel):
+class GiocoInfo(BaseModel):
+    nome: str = Field(description="Il nome del videogioco (es. 'Doom 3', 'Super Mario')")
+    uscito: bool = Field(description="Imposta a True se il gioco è già uscito ed è giocabile sul mercato. Imposta a False se è stato solo annunciato, è in fase di sviluppo, in pre-order o uscirà in futuro.")
 
+class RisoluzioneGioco(BaseModel):
     appid: Optional[int] = Field(
         default=None, 
-        description="L'AppID numerico di Steam del gioco scelto. Impostare a None se id_trovato è False."
-    )
+        description="L'AppID numerico di Steam del gioco scelto. Impostare a None se id_trovato è False.")
     nome_ufficiale_steam: Optional[str] = Field(
         default=None, 
-        description="Il nome esatto del gioco così come appare nella lista di Steam. Impostare a None se id_trovato è False."
-    )
+        description="Il nome esatto del gioco così come appare nella lista di Steam. Impostare a None se id_trovato è False.")
     motivazione: str = Field(
-        description="Spiega brevemente perché hai scelto questo specifico ID o perché ritieni che il gioco non sia presente."
-    )
+        description="Spiega brevemente perché hai scelto questo specifico ID o perché ritieni che il gioco non sia presente.")
 
 class FactCheckResult(BaseModel):
         discrepancies: str = Field(

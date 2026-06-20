@@ -23,9 +23,9 @@ def cerca_recensioni_semantica_pura(query, k=1):
     # NOTA: Abbiamo rimosso il parametro filter! L'IA cercherà liberamente ovunque.
     risultati = db.similarity_search(query_formattata, k=k)    
     
-    print(f"\n🔍 Ricerca semantica pura per: '{query}'")    
+    print(f"\nRicerca semantica pura per: '{query}'")    
     if not risultati:
-        print("❌ Nessun chunk trovato.")
+        print("Nessun chunk trovato.")
         return []
 
     for i, res in enumerate(risultati):

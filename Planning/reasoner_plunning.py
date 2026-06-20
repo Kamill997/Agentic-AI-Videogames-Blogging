@@ -5,12 +5,12 @@ from typing_extensions import Literal
 from langgraph.graph import END
 from State_template import PlanningState,llm_x,PlanningCommand
 from prompts.prompt_planner import prompt_planner,research_agent_prompt
-from tools.neo4j_tool import check_active_plan_tool,get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool
+from tools.neo4j_tool import check_active_plan_tool,get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool,get_unreviewed_released_games_tool
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from tools.tavily_search_tool import tavily_search_tool
 
 
-tools=[tavily_search_tool,get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool]
+tools=[tavily_search_tool,get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool,get_unreviewed_released_games_tool]
 tools_by_name = {tool.name: tool for tool in tools}
 llm_with_tools = llm_x.bind_tools(tools,parallel_tool_calls=False)
 
@@ -31,7 +31,7 @@ def planner_node(state: PlanningState) -> dict:
 def router_after_planner(state: PlanningState)->Command[Literal["research_node","hitl_planning_node","executor_node",END]]:
     azione = state.get("next_action")
     
-    if azione == "DO_RESEARCH":
+    if azione == "DO_RESEARCH": 
         return Command(goto="research_node")  
           
     elif azione in ["SHOW_MESSAGE"]:

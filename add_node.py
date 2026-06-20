@@ -42,16 +42,26 @@ def create_post_node_in_neo4j(state: AgentState):
 def create_review_post(session, post_data: InfoPostReview, content: str, data_post: str, links: List[dict]):
     query = """
     CREATE (p:Post {
-        id: randomUUID(),
         titolo: $titolo,
         tipo_post: 'Review',
         data: $data_post,
         content: $content,
         overview: $overview
     })
+    
+    // 1. Gestione del gioco principale recensito (SENZA booleano 'uscito')
     WITH p
-    MERGE (g:Game { nome: $gioco })
-    MERGE (p)-[:ABOUT]->(g)
+    MERGE (main_g:Game { nome: $gioco_principale })
+    SET main_g.uscito = true 
+    MERGE (p)-[:ABOUT]->(main_g)
+    
+    // 2. Gestione degli ALTRI giochi scoperti (CON booleano 'uscito')
+    WITH p
+    UNWIND $giochi_menzionati AS gioco_scoperto
+    WITH p, gioco_scoperto WHERE gioco_scoperto.nome IS NOT NULL AND gioco_scoperto.nome <> ''
+    MERGE (g_scoperto:Game { nome: gioco_scoperto.nome })
+    SET g_scoperto.uscito = coalesce(g_scoperto.uscito, false) OR gioco_scoperto.uscito
+    MERGE (p)-[:MENTIONS]->(g_scoperto) // Usiamo MENTIONS per distinguerli dal gioco recensito
     
     // Gestione editori
     WITH p
@@ -60,13 +70,12 @@ def create_review_post(session, post_data: InfoPostReview, content: str, data_po
     MERGE (pub:Publisher { nome: editore_nome })
     MERGE (p)-[:PUBLISHED_BY]->(pub)
     
-    // --- GESTIONE GENERI MULTIPLI COME LISTA ---
+    // Gestione generi multipli come lista
     WITH p
     UNWIND $genere AS genere_nome
     WITH p, genere_nome WHERE genere_nome IS NOT NULL AND genere_nome <> ''
     MERGE (gen:Genere { nome: genere_nome })
     MERGE (p)-[:HAS_GENERE]->(gen)
-    // -------------------------------------------
     
     // Gestione sorgenti
     WITH p
@@ -77,11 +86,22 @@ def create_review_post(session, post_data: InfoPostReview, content: str, data_po
     RETURN p.id AS post_id
     """
     
+    # Prepariamo la lista dei giochi menzionati strutturata per Cypher
+    giochi_menzionati_strutturati = []
+    if post_data.giochi_menzionati:
+        for g in post_data.giochi_menzionati:
+            if g and g.nome:
+                giochi_menzionati_strutturati.append({
+                    "nome": g.nome.strip().title(),
+                    "uscito": g.uscito
+                })
+
     result = session.run(
         query,
         {
             "titolo": post_data.titolo,
-            "gioco": post_data.gioco.strip().title() if post_data.gioco else "Sconosciuto",
+            "gioco_principale": post_data.gioco.strip().title() if post_data.gioco else "Sconosciuto",
+            "giochi_menzionati": giochi_menzionati_strutturati,
             "case_editrici": [c.strip().title() for c in post_data.case_editrici if c and c.strip()],
             "genere": [g.strip().title() for g in post_data.genere if g and g.strip()],
             "overview": post_data.overview, 
@@ -96,7 +116,6 @@ def create_review_post(session, post_data: InfoPostReview, content: str, data_po
 def create_news_post(session, post_data: InfoPostNews, content: str, data_post: str, links: List[dict]):
     query = """
     CREATE (p:Post {
-        id: randomUUID(),
         titolo: $titolo,
         tipo_post: 'News',
         data: $data_post,
@@ -104,13 +123,16 @@ def create_news_post(session, post_data: InfoPostNews, content: str, data_post: 
         overview: $overview 
     })
     
-    // Srotoliamo i giochi menzionati
+    // Gestione dei giochi menzionati nella news (CON booleano 'uscito')
     WITH p
-    UNWIND $titoli_interessati AS game_title
-    MERGE (g:Game { nome: game_title })
+    UNWIND $titoli_interessati AS gioco_info
+    WITH p, gioco_info WHERE gioco_info.nome IS NOT NULL AND gioco_info.nome <> ''
+    MERGE (g:Game { nome: gioco_info.nome })
+    // Aggiorna il valore a true se lo era già o se la news indica che è uscito
+    SET g.uscito = coalesce(g.uscito, false) OR gioco_info.uscito
     MERGE (p)-[:ABOUT]->(g)
     
-    // Srotoliamo gli editori
+    // Gestione editori
     WITH p
     UNWIND $case_editrici AS editore_nome
     WITH p, editore_nome WHERE editore_nome IS NOT NULL AND editore_nome <> ''
@@ -125,13 +147,23 @@ def create_news_post(session, post_data: InfoPostNews, content: str, data_post: 
     )
     RETURN p.id AS post_id
     """
+    
+    # Trasformiamo la lista di oggetti Pydantic GiocoInfo in una lista di dizionari per la query Cypher
+    giochi_strutturati = []
+    if post_data.titoli_interessati:
+        for g in post_data.titoli_interessati:
+            if g and g.nome:
+                giochi_strutturati.append({
+                    "nome": g.nome.strip().title(),
+                    "uscito": g.uscito
+                })
+
     result = session.run(
         query,
         {
             "titolo": post_data.titolo,
-            "gioco": post_data.gioco.strip().title() if post_data.gioco else "Sconosciuto",
+            "titoli_interessati": giochi_strutturati,
             "case_editrici": [c.strip().title() for c in post_data.case_editrici if c and c.strip()],
-            "genere": [g.strip().title() for g in post_data.genere if g and g.strip()],
             "overview": post_data.overview, 
             "content": content,
             "data_post": data_post,

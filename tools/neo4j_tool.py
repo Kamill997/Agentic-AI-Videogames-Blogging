@@ -60,7 +60,6 @@ def get_planning_context_tool() -> str:
         with neo4j_driver.session() as session:
             result_cursor = session.run(query)
             record = result_cursor.single()
-            avvisi = []
 
             if record is None:
                 news, recs, recent_rec_titles, ultimi_5_generi, recent_news_details, tutti_i_generi = 0, 0, [], [], [], []
@@ -73,14 +72,13 @@ def get_planning_context_tool() -> str:
                 tutti_i_generi = record["tutti_i_generi_recensiti"]
                 
             context = {
-                "avvisi": avvisi,
                 "statistiche": {"news": news, "recensioni": recs},
                 "varietà_tematica": {
                     "ultimi_5_generi": ultimi_5_generi,
                     "tutti_i_generi_recensiti": tutti_i_generi
                 },
                 "ultime_recensioni": recent_rec_titles,
-                "news_recenti_dettagli": recent_news_details 
+                "news_recenti_pubblicate": recent_news_details 
             }
                         
             return json.dumps(context, indent=2, ensure_ascii=False)
@@ -181,3 +179,41 @@ def check_news_already_published_tool(argomento: str) -> dict:
             
     except Exception as e:
         return {"is_duplicate": False, "error": f"Errore: {str(e)}", "data": []}
+    
+
+@tool
+def get_unreviewed_released_games_tool() -> dict:
+    """
+    Da usare quando si vuole proporre una RECENSIONE.
+    Recupera dal database la lista dei giochi 'scoperti' (tramite news o citazioni) 
+    che sono già usciti sul mercato (uscito: true) ma che NON hanno ancora una recensione.
+    Ritorna una lista di nomi di videogiochi da cui poter attingere.
+    """
+    query = """
+    MATCH (g:Game)
+    // Il gioco deve essere uscito
+    WHERE g.uscito = true 
+      // E NON deve esistere una recensione che parla esplicitamente di lui
+      AND NOT EXISTS { MATCH (p:Post {tipo_post: 'Review'})-[:ABOUT]->(g) }
+    RETURN g.nome AS gioco
+    """
+    try:
+        with neo4j_driver.session() as session:
+            result_cursor = session.run(query)
+            records = [record["gioco"] for record in result_cursor]
+            
+            if not records:
+                return {
+                    "success": True,
+                    "message": "Nessun gioco in backlog. Non ci sono giochi usciti in attesa di recensione.",
+                    "giochi_disponibili": []
+                }
+            
+            return {
+                "success": True,
+                "message": f"Trovati {len(records)} giochi usciti e in attesa di recensione.",
+                "giochi_disponibili": records
+            }
+            
+    except Exception as e:
+        return {"success": False, "error": f"Errore durante il recupero dei giochi: {str(e)}", "giochi_disponibili": []}

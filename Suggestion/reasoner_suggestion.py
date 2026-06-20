@@ -6,9 +6,9 @@ from State_template import StateSuggestion,llm_x
 from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 from prompts.prompt_suggetion import research_agent_prompt_suggestion
 from tools.tavily_search_tool import tavily_search_tool
-from tools.neo4j_tool import get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool
+from tools.neo4j_tool import get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool,get_unreviewed_released_games_tool
 
-tools=[tavily_search_tool,get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool]
+tools=[tavily_search_tool,get_planning_context_tool,check_game_already_reviewed_tool,check_news_already_published_tool,get_unreviewed_released_games_tool]
 tools_by_name = {tool.name: tool for tool in tools}
 llm_with_tools = llm_x.bind_tools(tools,parallel_tool_calls=False)
 

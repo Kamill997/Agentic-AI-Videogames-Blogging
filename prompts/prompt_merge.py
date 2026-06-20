@@ -29,9 +29,9 @@ REGOLE:
 
 STRUTTURA RECENSIONE OBBLIGATORIA E TASSATIVA:
 SE IL GIOCO NON è USCITO NON FARE LA RECENSIONE, COMUNICA SOLO "IL GIOCO NON è USCITO, ECCO QUALCHE INFORMAZIONE...".
-DEVI INDICARE QUALI SONO LE INFORMAZIONI CHE USI OTTENUTE DAL RAG SOLO ED ESCLUSIVAMENTE SE LE HAI USATE EFFETTIVAMENTE PERCHè RELATIVE AL VIDEOGIOCO CORRETTO, SE ERANO INFORMAZIONI RELATIVE AD UN ALTRO GIOCO E QUINDI NON LE HAI USATE NON DIRE NULLA.
+DEVI INDICARE QUALI SONO LE INFORMAZIONI CHE USI OTTENUTE DAL RAG (Usando il tool RAG_tool) SOLO ED ESCLUSIVAMENTE SE LE HAI USATE EFFETTIVAMENTE PERCHè RELATIVE AL VIDEOGIOCO CORRETTO, SE ERANO INFORMAZIONI RELATIVE AD UN ALTRO GIOCO E QUINDI NON LE HAI USATE NON DIRE NULLA.
 I TOOL TAVILY, recensioni_utenti_steam,ottieni_prezzo_gioco NON FANNO PARTE DEL RAG.
-La recensione DEVE essere strutturata PER PARAGRAFI (con titolo) in maniera discorsiva con paragrafi ricchi di informazioni:
+La recensione DEVE essere strutturata PER PARAGRAFI (con titolo, NO NUMERATI) in maniera MOLTO discorsiva con paragrafi ricchi di informazioni E NON BREVI FRASI:
 1) Intro (in cui si dice il titolo,il genere(sparatutto, strategico, simulatore di guida, avventura,ecc) la data di uscita, piattafrome su cui è disponibile, casa editrice, contesto  di uscita se rilevante ed altre info)
 2) Introduzione al contesto narrativo, al personaggio principale, alla storia, all'ambientazione (spazio, antico egitto, futuristico) con frasi ad effetto che portano al continuo della lettura della recensione. Trama e incipit della storia (senza spoiler):racconta lo scopo del protagonista e su cosa si concentra la trama
 3) Gameplay DETTAGLIATO (non riportare nessuna informazione su altri elementi come grafica, audio, prestazioni, ecc in questa sezione, che deve essere focalizzata SOLO sul gameplay)
@@ -41,7 +41,7 @@ La recensione DEVE essere strutturata PER PARAGRAFI (con titolo) in maniera disc
    * SE presenta il multiplayer
    * meccaniche di gioco
    * Ruoli e classi se presenti
-La sezione gameplay DEVE descrivere:
+La sezione gameplay DEVE descrivere IN MANIERA DISCORSIVA:
 Gameplay principale (meccaniche di gameplay, ad es combattimento a turni, possibilità di uso di superpoteri, tipologia di armi ecc)
 cosa fa concretamente il giocatore 
 Meccanica distintiva del gioco (il personaggio si arrambica sui muri? Il gioco è basato su scelte morali? Il gioco ha un sistema di crafting complesso? ecc.)
@@ -57,7 +57,7 @@ SEZIONI NON OBBLIGATORIO, SE NON PRESENTI NON INDICARE COMPLETAMENTE IL CAMPO E 
 
 STILE:
 * Tono editoriale moderno (IGN/GameSpot).
-* Non essere riassuntivo ma nemmeno ripetitivo
+* Non essere riassuntivo
 * RIPORTA TUTTE LE INFORMAZIONI CHE HAI
 * Non ripetere gli stessi concetti con parole diverse.
 

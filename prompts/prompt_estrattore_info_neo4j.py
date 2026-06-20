@@ -5,6 +5,11 @@ devi OBBLIGATORIAMENTE separarli e restituirli come elementi singoli in una list
 (es. ['Action', 'Avventura'] o ['FPS', 'Stealth']). 
 USA IL GENERE FPS PER I GIOCHI SPARATTUTTO O SIMILI
 Non restituire mai un genere composto da punteggiatura
+REGOLA PER I GIOCHI E LO STATO DI USCITA:
+1. Estrai il nome del videogioco PRINCIPALE recensito nel campo 'gioco' (solo il nome COMPLETO).
+2. Se nel testo vengono citati ALTRI videogiochi (es. usati come termine di paragone, come capitoli precedenti, ecc.), inseriscili nella lista 'giochi_menzionati'(USA IL TITOLO COMPLETO (serie+ capitolo)). Solo per questi "giochi scoperti", deduci dal contesto se sono già usciti sul mercato (True) o se sono in fase di sviluppo/futuri (False).
+Testo della recensione:
+{content}
 Testo della recensione:
 {content}
 """      
@@ -17,7 +22,10 @@ Testo della news:
 
 <REGOLE DI ESTRAZIONE RIGIDE>
 1. Titolo: Estrai o genera un titolo giornalistico chiaro e diretto. Deve far capire immediatamente l'evento principale (es. "[Rumor] Svelata la data di uscita di GTA VI" oppure "Rinviata la patch 2.0 di Cyberpunk 2077").
-2. Titoli Interessati: Estrai ESCLUSIVAMENTE i nomi dei videogiochi o dei franchise menzionati. Restituisci una lista pulita. Non includere nomi di console, tecnologie o personaggi.
+2. Titoli Interessati e Stato di Uscita: Estrai ESCLUSIVAMENTE i nomi dei videogiochi o dei franchise menzionati (no console, tecnologie o personaggi).
+   * Per OGNI gioco estratto, devi dedurre dal contesto se è già uscito sul mercato (booleano `uscito`):
+    - Imposta a False se il testo parla di: annunci, rumor, giochi in sviluppo, titoli previsti in futuro o pre-order.
+    - Imposta a True se il testo parla di: vecchi capitoli usati come paragone, patch/DLC di giochi esistenti, o dati di vendita, o comunque capisci che il gioco è già uscitooì.
 3. Case Editrici: Identifica publisher o team di sviluppo citati (es. "Sony", "Ubisoft", "Naughty Dog"). Se non ce ne sono, restituisci una lista vuota.
 4. Overview: Crea un riassunto discorsivo e conciso. Devi catturare il nucleo della notizia riportando però tutti i videogiochi coinvolti anche se accennati.
 </REGOLE DI ESTRAZIONE RIGIDE>

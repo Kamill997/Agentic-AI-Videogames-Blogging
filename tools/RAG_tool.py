@@ -23,10 +23,8 @@ def RAG_tool(query: str, ragionamento: str) -> str:
         collection_name=nome_db_RAG
     )
     
-    # Prepariamo la query
     query_formattata = f"query: {query}"
     
-    # Aumentiamo k a 3 per avere più contesto, ma filtreremo ogni risultato
     risultati = db.similarity_search_with_relevance_scores(query_formattata, k=3) 
     
     if not risultati:
