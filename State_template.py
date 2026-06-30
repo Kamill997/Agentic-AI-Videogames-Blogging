@@ -1,7 +1,6 @@
 from typing import Annotated, List, TypedDict
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
-from langgraph.graph import MessagesState
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from typing_extensions import Optional
@@ -43,6 +42,7 @@ class AgentState(MessagesState): #Stato principale
     link_source: List[str] # link estratti da Tavily nel nodo merge
     fact_check_warning: Optional[str] # Avvisi per discrepanze trovate
     game_name_for_rag: Optional[str]
+    RAG_messages: Annotated[list, add_messages] 
 
 class TriageState(MessagesState): #stato del sottografo del triage 
     query: str #Query 
@@ -135,3 +135,4 @@ class FactCheckResult(BaseModel):
         has_conflicts: Literal["si", "no"] = Field(
             description="Scrivi 'si' se la bozza contiene informazioni inventate o errate rispetto alle fonti, altrimenti 'no'."
         )
+

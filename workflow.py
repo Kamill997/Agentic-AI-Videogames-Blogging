@@ -24,8 +24,7 @@ workflow.add_node("refine_proposal", refine_proposal)
 workflow.add_node("suggestion_subgraph", compiled_suggestion_subgraph )
 workflow.add_node("create_post_node_in_neo4j",create_post_node_in_neo4j)
 workflow.add_node("planning_subgraph",compiled_planning_subgraph)
-
-workflow.add_node("fact_check_node", fact_check_node) # NUOVO
+workflow.add_node("fact_check_node", fact_check_node) 
 
 workflow.add_edge(START, "triage_unit")
 workflow.add_edge("triage_unit","router_after_triage")

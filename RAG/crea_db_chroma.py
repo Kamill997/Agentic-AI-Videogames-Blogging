@@ -49,3 +49,4 @@ def crea_db_RAG(file_path):
 if __name__ == "__main__":
     percorso_file = os.path.join("RAG", "recensioni.md")
     crea_db_RAG(percorso_file)
+    

@@ -38,55 +38,45 @@ def create_post_node_in_neo4j(state: AgentState):
     return {"neo4j_post_id": post_id}
 
 
-
 def create_review_post(session, post_data: InfoPostReview, content: str, data_post: str, links: List[dict]):
     query = """
     CREATE (p:Post {
+        id: randomUUID(),
         titolo: $titolo,
         tipo_post: 'Review',
         data: $data_post,
         content: $content,
         overview: $overview
     })
-    
-    // 1. Gestione del gioco principale recensito (SENZA booleano 'uscito')
-    WITH p
     MERGE (main_g:Game { nome: $gioco_principale })
     SET main_g.uscito = true 
     MERGE (p)-[:ABOUT]->(main_g)
-    
-    // 2. Gestione degli ALTRI giochi scoperti (CON booleano 'uscito')
-    WITH p
-    UNWIND $giochi_menzionati AS gioco_scoperto
-    WITH p, gioco_scoperto WHERE gioco_scoperto.nome IS NOT NULL AND gioco_scoperto.nome <> ''
-    MERGE (g_scoperto:Game { nome: gioco_scoperto.nome })
-    SET g_scoperto.uscito = coalesce(g_scoperto.uscito, false) OR gioco_scoperto.uscito
-    MERGE (p)-[:MENTIONS]->(g_scoperto) // Usiamo MENTIONS per distinguerli dal gioco recensito
-    
-    // Gestione editori
-    WITH p
-    UNWIND $case_editrici AS editore_nome
-    WITH p, editore_nome WHERE editore_nome IS NOT NULL AND editore_nome <> ''
-    MERGE (pub:Publisher { nome: editore_nome })
-    MERGE (p)-[:PUBLISHED_BY]->(pub)
-    
-    // Gestione generi multipli come lista
-    WITH p
-    UNWIND $genere AS genere_nome
-    WITH p, genere_nome WHERE genere_nome IS NOT NULL AND genere_nome <> ''
-    MERGE (gen:Genere { nome: genere_nome })
-    MERGE (p)-[:HAS_GENERE]->(gen)
-    
-    // Gestione sorgenti
-    WITH p
+
+    FOREACH (gioco_scoperto IN $giochi_menzionati |
+        MERGE (g_scoperto:Game { nome: gioco_scoperto.nome })
+        SET g_scoperto.uscito = coalesce(g_scoperto.uscito, false) OR gioco_scoperto.uscito
+        MERGE (p)-[:MENTIONS]->(g_scoperto)
+    )
+
+    FOREACH (editore_nome IN $case_editrici |
+        MERGE (pub:Publisher { nome: editore_nome })
+        MERGE (p)-[:PUBLISHED_BY]->(pub)
+        MERGE (main_g)-[:PUBLISHED_BY]->(pub)
+    )
+
+    FOREACH (genere_nome IN $genere |
+        MERGE (gen:Genere { nome: genere_nome })
+        MERGE (p)-[:HAS_GENERE]->(gen)
+        MERGE (main_g)-[:HAS_GENERE]->(gen)
+    )
+
     FOREACH (link_item IN $links |
         MERGE (s:Source { nome: link_item.domain })
         MERGE (p)-[:SOURCED_FROM { exact_url: link_item.url }]->(s)
     )
+
     RETURN p.id AS post_id
     """
-    
-    # Prepariamo la lista dei giochi menzionati strutturata per Cypher
     giochi_menzionati_strutturati = []
     if post_data.giochi_menzionati:
         for g in post_data.giochi_menzionati:
@@ -116,39 +106,33 @@ def create_review_post(session, post_data: InfoPostReview, content: str, data_po
 def create_news_post(session, post_data: InfoPostNews, content: str, data_post: str, links: List[dict]):
     query = """
     CREATE (p:Post {
+        id: randomUUID(),
         titolo: $titolo,
         tipo_post: 'News',
         data: $data_post,
         content: $content,
         overview: $overview 
     })
-    
-    // Gestione dei giochi menzionati nella news (CON booleano 'uscito')
-    WITH p
-    UNWIND $titoli_interessati AS gioco_info
-    WITH p, gioco_info WHERE gioco_info.nome IS NOT NULL AND gioco_info.nome <> ''
-    MERGE (g:Game { nome: gioco_info.nome })
-    // Aggiorna il valore a true se lo era già o se la news indica che è uscito
-    SET g.uscito = coalesce(g.uscito, false) OR gioco_info.uscito
-    MERGE (p)-[:ABOUT]->(g)
-    
-    // Gestione editori
-    WITH p
-    UNWIND $case_editrici AS editore_nome
-    WITH p, editore_nome WHERE editore_nome IS NOT NULL AND editore_nome <> ''
-    MERGE (pub:Publisher { nome: editore_nome })
-    MERGE (p)-[:PUBLISHED_BY]->(pub)
-    
-    // Gestione sorgenti
-    WITH p
+
+    FOREACH (gioco_info IN $titoli_interessati |
+        MERGE (g:Game { nome: gioco_info.nome })
+        SET g.uscito = coalesce(g.uscito, false) OR gioco_info.uscito
+        MERGE (p)-[:ABOUT]->(g)
+    )
+
+    FOREACH (editore_nome IN $case_editrici |
+        MERGE (pub:Publisher { nome: editore_nome })
+        MERGE (p)-[:PUBLISHED_BY]->(pub)
+    )
+
     FOREACH (link_item IN $links |
         MERGE (s:Source { nome: link_item.domain })
         MERGE (p)-[:SOURCED_FROM { exact_url: link_item.url }]->(s)
     )
+
     RETURN p.id AS post_id
     """
     
-    # Trasformiamo la lista di oggetti Pydantic GiocoInfo in una lista di dizionari per la query Cypher
     giochi_strutturati = []
     if post_data.titoli_interessati:
         for g in post_data.titoli_interessati:
@@ -172,6 +156,7 @@ def create_news_post(session, post_data: InfoPostNews, content: str, data_post: 
     )
     record = result.single()
     return record["post_id"] if record else None
+
 
 def elabora_link_sorgente(links: List[str]) -> List[dict]:
     """

@@ -10,6 +10,7 @@ Scrivi una recensione completa, scorrevole e informativa, eliminando completamen
 Sei tu il recensore quindi scrivi in prima persona come AUTORE  
 DEVI TENERE IN CONSIDERAZIONI EVENTUALI RICHIESTE ESPLICITE DELL'UTENTE:
 {richiesta}
+La data di oggi è {data}
 
 REGOLE:
 * NON copiare frasi originali.
@@ -82,6 +83,7 @@ Ecco il contenuto grezzo della pagina:
 </webpage_content>
 DEVI TENERE IN CONSIDERAZIONI EVENTUALI RICHIESTE ESPLICITE DELL'UTENTE:
 {richiesta}
+La data di oggi è {data}
 
 
 Genera a partire dalle informazioni che hai ricevuto una news videoludica chiara, completa,professionale,focalizzata sulle informazioni realmente importanti senza tralasciare nulla
@@ -117,17 +119,16 @@ Il tuo output deve contenere ESCLUSIVAMENTE i seguenti TRE PARAGRAGI, scritti es
 -CONTENUTO PRINCIPALE
 [Scrivi qui il corpo della notizia con tutti i dettagli. Integra in questo paragrafo: i dettagli tecnici, le nuove funzionalità/update, le informazioni ufficiali rilevanti, le informazioni nuove o importanti e l'impatto che la notizia ha sul gioco o sulla community].
 
+* NON USARE MAI LE INFORMAZIONI OTTENUTE DAL RAG SE FANNO RIFERIMENTO AD UN'ALTRA NOTIZIA/AZIENDA/NON FORNISCE INFORMAZIONI UTILI
+* USA LE INFORMAZIONI OTTENUTE DAL RAG SOLO SE SONO RELATIVE AL GIOCO/EVENTO CORRETTO
+* INDICA SEMPRE LE INFORMAZIONI DEL RAG CHE HAI USATO OTTENUTE ESCLUSIVAMENTE DAL TOOL RAG, E NON DA ALTRI TOOL.
+
 Se la news riguarda:
-Un annuncio:
-→ spiega cosa è stato annunciato
-Un trailer:
-→ descrivi gameplay, ambientazione e novità mostrate
-Un update/patch:
-→ riporta modifiche, fix, bilanciamenti e contenuti
-Un rinvio:
-→ specifica nuova finestra di uscita e motivazioni
-Dati di vendita:
-→ riporta numeri e risultati principali
+Un annuncio → spiega cosa è stato annunciato
+Un trailer → descrivi gameplay, ambientazione e novità mostrate
+Un update/patch → riporta modifiche, fix, bilanciamenti e contenuti
+Un rinvio → specifica nuova finestra di uscita e motivazioni
+Dati di venditab→ riporta numeri e risultati principali
 Dichiarazioni sviluppatori:
 → sintetizza le informazioni davvero importanti
 Stile giornalistico/editoriale moderno.

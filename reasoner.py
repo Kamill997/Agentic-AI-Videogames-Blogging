@@ -13,10 +13,10 @@ llm_with_tools = llm_p.bind_tools(tools,parallel_tool_calls=False)
 
 def llm_call(state: AgentState):
     """Analizza lo stato attuale e decidi le azioni successive.
-LLM decide se utilizzare uno strumento di ricerca o meno.
-Il modello analizza lo stato attuale della conversazione e decide se:
-1. Utilizzare strumenti di ricerca per raccogliere ulteriori informazioni.
-2. Fornire una risposta definitiva basata sulle informazioni raccolte.
+    LLM decide se utilizzare uno strumento di ricerca o meno.
+    Il modello analizza lo stato attuale della conversazione e decide se:
+    1. Utilizzare strumenti di ricerca per raccogliere ulteriori informazioni.
+    2. Fornire una risposta definitiva basata sulle informazioni raccolte.
     """    
     messages = state.get("messages", [])
     data_di_oggi = datetime.now().strftime("%d %B %Y") 

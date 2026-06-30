@@ -1,4 +1,5 @@
 import json
+from typing import List, Optional
 from langchain_core.tools import tool
 from neo4j_connection import neo4j_driver
 
@@ -217,3 +218,4 @@ def get_unreviewed_released_games_tool() -> dict:
             
     except Exception as e:
         return {"success": False, "error": f"Errore durante il recupero dei giochi: {str(e)}", "giochi_disponibili": []}
+    

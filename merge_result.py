@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from State_template import AgentState, llm_x
 from langchain_core.messages import HumanMessage, ToolMessage
@@ -11,6 +12,7 @@ def merge_result(state: AgentState):
     messages = state["messages"]
     topic = state["classification_decision"]
     richiesta_utente = state.get("query")
+    rag_messages = state.get("RAG_messages", [])
 
     links = []
     all_contents = []
@@ -36,22 +38,24 @@ def merge_result(state: AgentState):
     if not combined_content.strip():
         final_summary = "Nessun dato raccolto dai tool per poter generare un riassunto."
     else:
-        final_summary = summarize_webpage_content(combined_content, topic,richiesta_utente)
+        final_summary = summarize_webpage_content(combined_content, topic,richiesta_utente,rag_context=rag_messages)
 
     return {"merge_result": final_summary,"link_source": list(set(links))}
 
 
-def summarize_webpage_content(webpage_content: str, topic: str,richiesta_utente: str) -> str:
+def summarize_webpage_content(webpage_content: str, topic: str,richiesta_utente: str,rag_context: str) -> str:
     """
     Riassume il contenuto della pagina web utilizzando il modello di riassunto configurato.
     """
+    data_di_oggi = datetime.now().strftime("%d %B %Y") 
+
     try:
         if topic == "News":
             summarize_prompt = summarize_webpage_news
         else: 
             summarize_prompt = summarize_webpage_gameReview
 
-        summary = llm_x.invoke([HumanMessage(content=summarize_prompt.format(webpage_content=webpage_content, richiesta=richiesta_utente))])
+        summary = llm_x.invoke([HumanMessage(content=summarize_prompt.format(webpage_content=webpage_content, richiesta=richiesta_utente,data=data_di_oggi,rag_expansion=rag_context))])
         
         formatted_summary = f"{summary.content}\n"
         return formatted_summary
