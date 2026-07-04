@@ -14,37 +14,35 @@ tools=[tavily_search_tool,get_planning_context_tool,check_game_already_reviewed_
 tools_by_name = {tool.name: tool for tool in tools}
 llm_with_tools = llm_x.bind_tools(tools,parallel_tool_calls=False)
 
-def planner_node(state: PlanningState) -> dict:
+def planner_node(state: PlanningState) ->Command[Literal["research_node","hitl_planning_node","executor_node",END]]:
 
     richiesta=state.get("query")    
     active_plan = check_active_plan_tool.invoke({})
     prompt = prompt_planner.format(query=richiesta,active_plan=active_plan)
     model = llm_x.with_structured_output(PlanningCommand)
     decision = model.invoke(prompt)
-    return {
+    state_updates = {
         "active_plan": active_plan,
         "next_action": decision.action,
         "message": decision.message,
-        "planning_messages":[HumanMessage(content=richiesta)]
+        "planning_messages": [HumanMessage(content=richiesta)]
     }
 
-def router_after_planner(state: PlanningState)->Command[Literal["research_node","hitl_planning_node","executor_node",END]]:
-    azione = state.get("next_action")
-    
+    azione = decision.action
+
     if azione == "DO_RESEARCH": 
-        return Command(goto="research_node")  
+        return Command(goto="research_node", update=state_updates)  
           
-    elif azione in ["SHOW_MESSAGE"]:
-        return Command(goto="hitl_planning_node")
+    elif azione in ["SHOW_MESSAGE", "INTERACTION"]:
+        return Command(goto="hitl_planning_node", update=state_updates)
     
-    elif azione in ["INTERACTION"]:
-        return Command(goto="hitl_planning_node")
-    
-    elif azione in ["DELETE_EXISTING", "POP_NEXT", "COMMIT_TO_DB"]:
-        return Command(goto="executor_node")
+    elif azione in ["DELETE_EXISTING", "POP_NEXT"]:
+        return Command(goto="executor_node", update=state_updates)
         
     else:
-        return Command(goto=END)
+        return Command(goto=END, update=state_updates)
+    
+
     
 
 def research_node(state: PlanningState):

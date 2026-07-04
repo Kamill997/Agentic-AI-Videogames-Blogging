@@ -23,7 +23,6 @@ def triage_router(state: TriageState) -> Command[Literal["clarify_and_write_brie
     ])
 
     primo_messaggio = HumanMessage(content=blog_request)
-    print(primo_messaggio)
     if result.classification == "Review":
         goto = "clarify_and_write_brief"
         update = {

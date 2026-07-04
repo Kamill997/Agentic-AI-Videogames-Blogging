@@ -53,7 +53,7 @@ def fact_check_node(state: AgentState):
 
     warning = ""
     if risultato_check.has_conflicts == "si":
-        warning = f"⚠️ ALLUCINAZIONE/DISCREPANZA RILEVATA RISPETTO AI TOOL:\n{risultato_check.discrepancies}"
+        warning = f"ALLUCINAZIONE/DISCREPANZA RILEVATA RISPETTO AI TOOL:\n{risultato_check.discrepancies}"
 
     return {
         "fact_check_warning": warning if warning else None

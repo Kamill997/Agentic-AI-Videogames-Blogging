@@ -21,7 +21,7 @@ def tavily_search_tool(query: str, ragionamento: str) -> str:
         ragionamento: DEVI TASSATIVAMENTE scrivere un nuovo pensiero aggiornato OGNI VOLTA che chiami il tool, spiegando il perchè è stato invocato il tool
     """
     try:
-        result = tavily_client.search(query,include_images=False,max_results=1,exclude_domains=["reddit.com","Instagram.com", "youtube.com","facebook.com","ebay.com","tiktok.com", "www.dailymotion.com"])
+        result = tavily_client.search(query,include_images=False,max_results=1,exclude_domains=["reddit.com","Instagram.com","threads.com", "youtube.com","facebook.com","ebay.com","tiktok.com", "www.dailymotion.com"])
         return str(result)
     except Exception as e:
         return f"Errore durante la ricerca su Tavily: {str(e)}"

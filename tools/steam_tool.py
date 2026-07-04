@@ -68,7 +68,6 @@ def estrai_recensioni(tipo_recensione: str, recensione_url: str) -> tuple:
     try:
         res = requests.get(recensione_url, params=params, timeout=6).json()
         reviews = res.get("reviews", [])
-        summary = res.get("query_summary", {})
  
         risultati_formattati = []
         for r in reviews:

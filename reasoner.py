@@ -6,9 +6,9 @@ from prompts.prompt_scelta_tool import research_agent_prompt_review,research_age
 from tools.tavily_search_tool import tavily_search_tool
 from tools.RAG_tool import RAG_tool
 from tools.steam_tool import recensioni_utenti_steam,ottieni_prezzo_gioco
+from tools.neo4j_tool import cerca_post_gioco
 
-
-tools=[tavily_search_tool,RAG_tool,recensioni_utenti_steam,ottieni_prezzo_gioco]
+tools=[tavily_search_tool,RAG_tool,recensioni_utenti_steam,ottieni_prezzo_gioco,cerca_post_gioco]
 llm_with_tools = llm_p.bind_tools(tools,parallel_tool_calls=False)
 
 def llm_call(state: AgentState):

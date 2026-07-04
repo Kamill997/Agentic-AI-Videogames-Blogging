@@ -219,3 +219,58 @@ def get_unreviewed_released_games_tool() -> dict:
     except Exception as e:
         return {"success": False, "error": f"Errore durante il recupero dei giochi: {str(e)}", "giochi_disponibili": []}
     
+
+
+@tool
+def cerca_post_gioco(ragionamento:str,nome_gioco: str, nome_serie: Optional[str] = "") -> str:
+    """
+    Cerca nel database Neo4j i nodi Post (News o Recensioni) che menzionano 
+    il nome del gioco e/o della serie nei campi 'titolo', 'overview' o 'content'.
+    Parametri:
+    - ragionamento: Motivo della chiamata al tool
+    - nome_gioco: Nome del gioco da cercare (stringa) ES. Far Cry 5.
+    - nome_serie: Nome della serie da cercare (stringa, opzionale) ES Far Cry.
+    """
+    if not nome_gioco:
+        return "Errore: Il parametro 'nome_gioco' è obbligatorio per effettuare la ricerca."
+
+    gioco = nome_gioco.strip() if nome_gioco else ""
+    serie = nome_serie.strip() if nome_serie else ""
+
+    query = """
+    MATCH (p:Post)
+    WHERE 
+        ($gioco <> '' AND (
+            toLower(p.titolo) CONTAINS toLower($gioco) OR 
+            toLower(p.overview) CONTAINS toLower($gioco)
+        ))
+        OR 
+        ($serie <> '' AND (
+            toLower(p.titolo) CONTAINS toLower($serie) OR 
+            toLower(p.overview) CONTAINS toLower($serie)
+        ))
+    
+    RETURN 
+        p.tipo_post AS tipo_post,
+        p.titolo AS titolo,
+        p.data AS data_pubblicazione,
+        p.overview AS overview
+    ORDER BY p.data DESC
+    LIMIT 25
+    """
+
+    if neo4j_driver is None:
+        return "Errore: Il driver di Neo4j non è inizializzato."
+
+    try:
+        with neo4j_driver.session() as session:
+            result = session.run(query, {"gioco": gioco, "serie": serie})
+            records = result.data()
+            
+            if not records:
+                return f"Nessun post (News/Review) trovato per il gioco '{gioco}' o la serie '{serie}'."
+            
+            return json.dumps(records, ensure_ascii=False, indent=2)
+
+    except Exception as e:
+        return f"Errore durante l'esecuzione della query su Neo4j: {str(e)}"

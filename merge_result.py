@@ -32,6 +32,8 @@ def merge_result(state: AgentState):
                 all_contents.append(f"--- RISULTATI RAG (Interno) ---\n{msg.content}\n")
             elif msg.name == "recensioni_utenti_steam" or  msg.name == "ottieni_prezzo_gioco" or  msg.name == "numero_giocatori_attivi":
                 all_contents.append(f"--- RISULTATI numero_giocatori_attivi ---\n{msg.content}\n")
+            elif msg.name == "cerca_post_gioco":
+                all_contents.append(f"--- RISULTATI cerca_post_gioco ---\n{msg.content}\n")
 
     combined_content = "\n\n".join(all_contents)
     

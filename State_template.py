@@ -41,8 +41,7 @@ class AgentState(MessagesState): #Stato principale
     user_feedback: Optional[str] #Feedback testuale dell'utente (se fornito)
     link_source: List[str] # link estratti da Tavily nel nodo merge
     fact_check_warning: Optional[str] # Avvisi per discrepanze trovate
-    game_name_for_rag: Optional[str]
-    RAG_messages: Annotated[list, add_messages] 
+    
 
 class TriageState(MessagesState): #stato del sottografo del triage 
     query: str #Query 

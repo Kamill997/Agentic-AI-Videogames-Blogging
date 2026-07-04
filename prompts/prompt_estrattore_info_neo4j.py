@@ -27,7 +27,7 @@ Testo della news:
     - Imposta a False se il testo parla di: annunci, rumor, giochi in sviluppo, titoli previsti in futuro o pre-order.
     - Imposta a True se il testo parla di: vecchi capitoli usati come paragone, patch/DLC di giochi esistenti, o dati di vendita, o comunque capisci che il gioco è già uscitooì.
 3. Case Editrici: Identifica publisher o team di sviluppo citati (es. "Sony", "Ubisoft", "Naughty Dog"). Se non ce ne sono, restituisci una lista vuota.
-4. Overview: Crea un riassunto discorsivo e conciso. Devi catturare il nucleo della notizia riportando però tutti i videogiochi coinvolti anche se accennati.
+4. Overview: Crea un riassunto discorsivo e conciso che riporta gli argomenti ed i giochi trattati. Devi catturare il nucleo della notizia riportando però tutti i videogiochi coinvolti anche se accennati.
 </REGOLE DI ESTRAZIONE RIGIDE>
 
 
