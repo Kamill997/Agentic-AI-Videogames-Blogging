@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from State_template import AgentState, llm_x
+from State_template import AgentState, llm_merge
 from langchain_core.messages import HumanMessage, ToolMessage
 from prompts.prompt_merge import summarize_webpage_gameReview, summarize_webpage_news
 
@@ -57,7 +57,7 @@ def summarize_webpage_content(webpage_content: str, topic: str,richiesta_utente:
         else: 
             summarize_prompt = summarize_webpage_gameReview
 
-        summary = llm_x.invoke([HumanMessage(content=summarize_prompt.format(webpage_content=webpage_content, richiesta=richiesta_utente,data=data_di_oggi,rag_expansion=rag_context))])
+        summary = llm_merge.invoke([HumanMessage(content=summarize_prompt.format(webpage_content=webpage_content, richiesta=richiesta_utente,data=data_di_oggi,rag_expansion=rag_context))])
         
         formatted_summary = f"{summary.content}\n"
         return formatted_summary

@@ -10,6 +10,8 @@ clarify_review_instructions = """
   Approva SEMPRE se il gioco è  identificabile, ovvero:
   - La richiesta richiede una recensione di una serie accompagnata da un capitolo specifico (es. "Assassin’s Creed Origins", "COD Modern Warfare 2").
   - La richiesta richiede una recensioned ed è accompagnata dal titolo anche se manca la piattaforma o la versione o non lo conosci (es. "recensione It Takes Two", "Recensione di Elden Ring","Recensione di split fiction").
+  - La richiesta chiede un consiglio su cosa pubblicare
+  - La richiesta segue il pattern recensione di [gioco], [gioco] recensione o simili
 
   CRITERI DI CHIARIMENTO (need_clarification = true)
   Richiedi un chiarimento SOLO ED ESCLUSIVAMENTE nei seguenti casi:

@@ -21,6 +21,7 @@ tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 llm_p = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0)
 llm = init_chat_model("groq:llama-3.1-8b-instant", temperature=0)
 llm_x=init_chat_model("groq:openai/gpt-oss-120b", temperature=0)
+llm_merge=init_chat_model("groq:openai/gpt-oss-120b", temperature=0.5)
 
 
 class AgentInputState(TypedDict):

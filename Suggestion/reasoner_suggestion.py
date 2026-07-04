@@ -20,7 +20,7 @@ def reasoning_suggestion_node(state: StateSuggestion):
     messages = state.get("suggestion_messages", [])
 
     data_di_oggi = datetime.now().strftime("%d %B %Y") 
-    prompt = research_agent_prompt_suggestion.format(data=data_di_oggi)
+    prompt = research_agent_prompt_suggestion.format(data=data_di_oggi, richiesta=state.get("query", ""))
     invoke_messages = [SystemMessage(content=prompt)] + messages
     response = llm_with_tools.invoke(invoke_messages)
     update = {

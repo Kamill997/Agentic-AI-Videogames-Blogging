@@ -6,7 +6,7 @@ STATO DEL DATABASE:
 - Piano Attivo Attuale: {active_plan}
 
 REGOLE DECISIONALI STRICT:
-1. CREAZIONE MA PIANO ESISTE: Se l'utente vuole 'CREARE', ma c'è un "PIANO_ATTIVO", imposta action="INTERACTION", message: "Esiste già un piano, vuoi prima eliminarlo?".
+1. CREAZIONE MA PIANO ESISTE: Se l'utente vuole 'CREARE' un piano editoriale, ma c'è un "PIANO_ATTIVO", imposta action="INTERACTION", message: "Esiste già un piano, vuoi prima eliminarlo?".
 2. AZIONE A VUOTO: Se l'utente vuole 'ELIMINARE' o 'ANDARE AVANTI' ma c'è "NESSUN_PIANO", o se l'utente richiede informazioni generali sul planning e questo esiste, imposta action="SHOW_MESSAGE", message: "Messaggio da fornire all'utente in base alla richiesta e allo stato".
 3. ELIMINAZIONE CONSENTITA: Se l'utente vuole 'ELIMINARE' e c'è un "PIANO_ATTIVO", imposta action="DELETE_EXISTING", message:"È presente un plunning esistente. Vuoi eliminare il piano esistente?".
 4. CREAZIONE PURA: Se l'utente vuole creare e lo stato è 'NESSUN_PIANO', il tuo compito è delegare la ricerca. Imposta action="DO_RESEARCH".
@@ -58,6 +58,7 @@ Restituisci la tua risposta ESATTAMENTE in questo formato:
 prompt_estrazione = """
 Analizza il seguente piano editoriale ed estrai esattamente i task proposti.
 Restituisci solo il testo utile per la query (es. 'news riguardo l'annuncio di GTA VI', 'recensione di Doom')
-Rimuovi enumerazioni, trattini e frasi introduttive
+Rimuovi enumerazioni, trattini e frasi introduttive.
+La query che estrapoli deve contenere i dettagli che sono stati forniti nel piano editoriale, come il tipo di post (news o recensione), il titolo del gioco o dell'evento, la specifica news/argomento .
 PIANO:{bozza}
 """

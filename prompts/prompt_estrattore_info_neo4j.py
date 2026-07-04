@@ -22,7 +22,7 @@ Testo della news:
 
 <REGOLE DI ESTRAZIONE RIGIDE>
 1. Titolo: Estrai o genera un titolo giornalistico chiaro e diretto. Deve far capire immediatamente l'evento principale (es. "[Rumor] Svelata la data di uscita di GTA VI" oppure "Rinviata la patch 2.0 di Cyberpunk 2077").
-2. Titoli Interessati e Stato di Uscita: Estrai ESCLUSIVAMENTE i nomi dei videogiochi o dei franchise menzionati (no console, tecnologie o personaggi).
+2. Titoli Interessati e Stato di Uscita: Estrai ESCLUSIVAMENTE i nomi COMPLETI (serie + capitolo) dei videogiochi o dei franchise menzionati (no console, tecnologie o personaggi).
    * Per OGNI gioco estratto, devi dedurre dal contesto se è già uscito sul mercato (booleano `uscito`):
     - Imposta a False se il testo parla di: annunci, rumor, giochi in sviluppo, titoli previsti in futuro o pre-order.
     - Imposta a True se il testo parla di: vecchi capitoli usati come paragone, patch/DLC di giochi esistenti, o dati di vendita, o comunque capisci che il gioco è già uscitooì.
