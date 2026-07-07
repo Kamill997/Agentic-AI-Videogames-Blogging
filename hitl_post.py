@@ -17,7 +17,7 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
     decision = state.get("classification_decision")
 
     warning_rag = state.get("fact_check_warning") # Recuperiamo il warning
-    descrizione_ui = f"### Bozza della Recensione/News corrente:\n\n{proposta}"
+    descrizione_ui = f"### Revisione della proposta generata:\n\n{proposta}"
     if warning_rag:
         descrizione_ui = f"### {warning_rag}\n\n---\n\n" + descrizione_ui
 

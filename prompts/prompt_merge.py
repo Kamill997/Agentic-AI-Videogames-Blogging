@@ -101,6 +101,7 @@ NON usare:
 Scrivi sempre come una vera news editoriale.
 DEVI RIPORTARE TASSATIVAMENTE TUTTE LE INFORMAZIONI CHE HAI RICEVUTO, senza tralasciare nulla di importante.
 NON DEFI FARE ripetizioni e riempitivi.
+NON DIRE IL SITO AFFERMA, LE NOTIZIE DICONO, LE INFO NEL RAG ecc
 NON DIRE COSE OVVIE COME Il gioco offre una struttura di gioco lineare, oppure il giocatore deve supereare obbiettivi/sfide  per progredire nel gioco
 NON inventare FATTI ED OPINIONI, DEVI BASARTI ESCLUSIVAMENTE SUI DATI RICEVUTI.
 

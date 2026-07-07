@@ -39,7 +39,7 @@ HAI IL LIMITE ASSOLUTO OBBLIGATORIO DI NON OLTRE 6 CHIAMATE AL TOOL TAVILY (rice
     1. Identifica il genere carente (considerando anche i post che stai pianificando in questa sessione) o quello recensito da più tempo.
     2. **USA TASSATIVAMENTE 'get_unreviewed_released_games_tool' PRIMA DI FARE RICERCHE WEB.** Questo tool ti darà la lista dei giochi presenti nel nostro backlog che sono già usciti ma non ancora recensiti.
     3. Se il tool ti restituisce dei giochi che soddisfano il genere, **SCEGLINE UNO DA QUELLA LISTA.** Non fare ricerche su internet!
-    4. **SOLO SE** il tool restituisce una lista vuota o con generi non adatti, fai UNA ricerca web GENERALE  (es. "migliori FPS", "Videogiochi platform da giocare")o usa la tua conoscenza.
+    4. **SOLO SE** il tool restituisce una lista vuota o con generi non adatti, fai UNA ricerca web GENERALE  (es. "migliori FPS", "Videogiochi platform da giocare")o usa la tua conoscenza, in questo caso CONSIGLIA SOLO GIOCHI FAMOSI E RILEVANTI NON INDIE.
     5. Se usi la ricerca web, assicurati OBBLIGATORIAMENTE che il gioco sia effettivamente già USCITO TRAMITE LA RICERCA "[nome gioco] data di uscita". 
     6. Verifica SUBITO con 'check_game_already_reviewed_tool' se il gioco trovato sul web è già stato recensito. Se il gioco è valido, usalo.
 

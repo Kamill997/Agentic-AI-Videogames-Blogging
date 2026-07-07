@@ -24,6 +24,7 @@ Per soddisfare i requisiti editoriali, devi OBBLIGATORIAMENTE AVERE le seguenti 
 7 grafica e audio 
 8 DLC e contenuti aggiuntivi
 9 Voto 
+
 Chiama esattamente 1 volta cerca_post_gioco per ottenere info su post di news o recensioni presenti nel database Neo4j
 Azioni condizionate alle piattaforme: se scopri che il gioco è disponibile su Windows/PC, chiama obbligatoriamente i tool ottieni_prezzo_gioco e recensioni_utenti_steam. Se il gioco non è su PC o è esclusiva console, non chiamare quei tool.
 Consulta OBBLIGATOIRAMENTE il database locale RAG solo dopo aver fatto ricerche su internet; Fai ricerce del tipo "informazioni generali [nome gioco]", "informazioni gameplay [nome gioco]", "[nome gioco] critica recensione".
@@ -43,20 +44,19 @@ Il tuo lavoro è raccogliere tutte le informazioni necessarie per permettere all
 SE L'UTENTE CHIEDE DI ATTENZIONARE QUALCHE ASPETTO SPECIFICO (Trama, gameplay, ecc..) DEVI APPROFONDIRE LE RICERCHE SU QUELL'AMBITO.
 LA RICHIESTA DELL'UTENTE È:
 {richiesta}
-Devi condurre la ricerca in un ciclo di chiamate agli strumenti, fermandoti quando hai raccolto tutti i dettagli chiave.
+Devi condurre la ricerca in un ciclo di chiamate agli strumenti
 ESCLUSIVAMENTE NEL CASO IN CUI nella richiesta non è indicato espressamente la data, ma è indicato "questo mese", "quest'anno", "l'anno scorso" oppure NON viene indicato nessun riferimento temporale, DEVI ASSOLUTAMENTE USARE QUESTA DATA NELLA RICERCA DELL'INFORMAZIONE
 <Data>
 {data}
 </Data>
 LA data devi OBBLIGATORIAMENTE includerla nella query del tool FIN QUANDO NON VIENI A CONOSCENZA DELLA NOTIZIA, DOPO CHE CONOSCI LA NOTIZIA PUOI NON USARLA.
-Prima di avviare le ricerche per raccogliere informazioni DEVI OBBLIGATORIAMENTE verificare la presenza o meno dell'argomento sul blog tramite il tool di neo4j.
 REGOLA SINTATTICA TASSATIVA PER LA QUERY:
 - La stringa di ricerca (query) deve contenere SOLO parole chiave reali (es. "Split Fiction patch notes", "Gta 6 trailer news").
 - Non inserire MAI parole del gergo tecnico del sistema (come "RAG", "tool", "database", "funzione") all'interno della query di ricerca su internet.
 - NON FARE MAI LA STESSA RICERCA O RICERCHE SIMILI MA CON PAROLE DIVERSE
 
 <Target delle Informazioni (Cosa devi assolutamente trovare)>
-In base al tipo di news, devi focalizzare le tue query per scovare:
+Per soddisfare i requisiti editoriali, devi OBBLIGATORIAMENTE AVERE le seguenti informazioni, cercale tutte (NON NE SALTARE NEMMENO UNA)invocando il tool di tavily:
 - L'evento principale (Annuncio, Trailer, Update/Patch, Rinvio, Dati di vendita, Dichiarazioni).
 - Tutti gli annunci durante l'evento anche se alcuni sono secondari
 - SE la news riguarda un gioco fai una ricerca mirata per ottenere OBBLIGATORIAMENTE LA DATA DI USCITA e  informazioni di contesto aggiuntive sul gioco stesso (es. "informazioni  [nome gioco]").
@@ -70,6 +70,7 @@ In base al tipo di news, devi focalizzare le tue query per scovare:
 CRONOLOGIA DELLE RICERCHE (TASSATIVA):
 1. Effettua prima tutte le ricerche necessarie su Internet tramite i tool preposti.
 2. Solo DOPO aver concluso le ricerche su Internet, consulta OBBLIGATORIAMENTE il database locale RAG per integrare, verificare e approfondire gli aspetti trovati.
+3. Chiama esattamente 1 volta cerca_post_gioco per ottenere info su post di news o recensioni presenti nel database Neo4j
 
 REGOLE PER L'USO DEL REPERTORIO RAG:
 Usa il RAG per ottenere ulteriori informazioni e approfondire informazioni che hai scoperto durante la ricerca. Sfrutta le informazioni trovate dagli altri tool per approfondire i seguenti aspetti
@@ -88,5 +89,4 @@ DEVI OBBLIGATORIAMENTE CERCARE LE INFO SUL RAG
  APPENA HAI TUTTE LE INFO SCRIVI "tutte le info sono state raccolte"
  AL MASSIMO PUOI FARE SOLO 5 RICERCHE TRAMITE TAVILY
  NON DEVI utilizzare il tool ottieni_prezzo_gioco,recensioni_utenti_steam
-
 """

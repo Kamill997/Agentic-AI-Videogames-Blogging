@@ -1,3 +1,4 @@
+import ast
 from datetime import datetime
 import json
 from State_template import AgentState, llm_merge
@@ -21,7 +22,8 @@ def merge_result(state: AgentState):
         if isinstance(msg, ToolMessage):
             if msg.name == "tavily_search_tool":
                 try:
-                    data = json.loads(msg.content)
+                    data = ast.literal_eval(msg.content)
+                    results = data.get("results", [])
                     for r in data.get("results", []):
                         if r.get("url"):
                             links.append(r.get("url"))
