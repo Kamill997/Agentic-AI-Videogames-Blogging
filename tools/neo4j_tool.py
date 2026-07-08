@@ -115,7 +115,7 @@ def check_game_already_reviewed_tool(game_name: str) -> dict:
     """
     query = """
     MATCH (p:Post {tipo_post: 'Review'})
-    WHERE toLower(p.overview) CONTAINS toLower($game_name)
+    WHERE toLower(p.title) CONTAINS toLower($game_name)
        OR EXISTS {
            MATCH (p)-[:ABOUT]->(g:Game)
            WHERE toLower(g.nome) = toLower($game_name)

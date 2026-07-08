@@ -42,7 +42,7 @@ def trova_id_gioco(gioco_richiesto: str)-> tuple:
         """
         
         llm_strutturato = llm_p.with_structured_output(RisoluzioneGioco)
-        risposta_llm: RisoluzioneGioco = llm_strutturato.invoke(prompt)
+        risposta_llm = llm_strutturato.invoke(prompt)
         
         if risposta_llm.appid is None:
             return None, f"Non ho trovato il gioco '{gioco_richiesto}'."

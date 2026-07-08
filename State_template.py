@@ -99,6 +99,13 @@ class ResearchQuestion(BaseModel): #uscite del write_research_brief
     game_name: str = Field(description="Il nome del videogioco principale oggetto della ricerca.")
     research_brief: str = Field(description="La query di ricerca completa generata",)
 
+class DuplicateEvaluation(BaseModel): #uscita rilevamento duplicati
+    is_real_duplicate: bool = Field(
+        description="True se il nuovo contenuto proposto sovrappone in modo ridondante gli articoli esistenti (stesso focus/scopo). False se è un argomento diverso o un falso positivo."
+    )
+    reasoning: str = Field(
+        description="Breve spiegazione del ragionamento che ha portato a decidere se è un duplicato o meno."
+    )
 
 class InfoPostReview(BaseModel): #usato per estrarre info per aggiungere il nodo review 
     titolo: str = Field(description="Un titolo estratto o generato per il post MA che permetta di capire che è una recensione il gioco che si sta recensendo")
@@ -114,11 +121,11 @@ class InfoPostNews(BaseModel): #usato per estrarre info per aggiungere il nodo n
     case_editrici: List[str] = Field(description="Lista separata di ogni casa editrice o software house trovata.")
     overview: str = Field(description="Un riassunto conciso di tutto ciò di cui si parla nel post, in modo da avere una panormaica COMPLETA del contenuto")
 
-class GiocoInfo(BaseModel):
+class GiocoInfo(BaseModel): #usato per estrarre info sui giochi menzionati nei post
     nome: str = Field(description="Il nome del videogioco (es. 'Doom 3', 'Super Mario')")
     uscito: bool = Field(description="Imposta a True se il gioco è già uscito ed è giocabile sul mercato. Imposta a False se è stato solo annunciato, è in fase di sviluppo, in pre-order o uscirà in futuro.")
 
-class RisoluzioneGioco(BaseModel):
+class RisoluzioneGioco(BaseModel): #uscita strutturata del tool steam_tool per risolvere il nome del gioco e ottenere l'AppID
     appid: Optional[int] = Field(
         default=None, 
         description="L'AppID numerico di Steam del gioco scelto. Impostare a None se id_trovato è False.")
@@ -135,4 +142,5 @@ class FactCheckResult(BaseModel):
         has_conflicts: Literal["si", "no"] = Field(
             description="Scrivi 'si' se la bozza contiene informazioni inventate o errate rispetto alle fonti, altrimenti 'no'."
         )
+
 

@@ -3,7 +3,7 @@ triage_system_prompt = """
 Sei un assistente per la classificazione dell'intento per un blog di SOLO videogiochi.
 Se la richiesta NON riguarda in modo chiaro e diretto il mondo dei videogiochi  devi classificarla come "Ignore".
 "Ignore" ha priorità su tutte le altre categorie.
-Classifica come IGNORE qualunque cosa che non sia chiaramente una richiesta di recensione, guida, Pianificazione editoriale o suggerimento specifico per videogiochi.
+Classifica come IGNORE qualunque cosa che non sia chiaramente una richiesta di recensione di un videogioco, news relativo all'ambito gaming, Pianificazione editoriale o suggerimento su cosa poter pubblicare.
 Se la richiesta è per fare news/recensioni/guide di periferiche o componenti da gaming classifica come "ignore"
 Classifica come Ignore tutte le richieste di recensione o news ma su ambiti che non sono videogiochi (come film, serie TV, libri, tecnologia, cibo, moda, ecc.)
 Devi analizzare ogni richiesta del proprietario del blog e assegnarla alla categoria più appropriata in base al contenuto e all'intento.
@@ -36,37 +36,32 @@ Sono il proprietario e caporedattore di un blog di videogiochi multi-piattaforma
 """
 
 default_triage_instructions = """
-Per classificare accuratamente, segui queste linee guida ed esempi specifici:
+Regole di classificazione ed esempi:
 
+1. Review: L'utente chiede un'opinione, un voto, una valutazione o la stesura di una recensione su un videogioco specifico.
+   - Esempio: "Prepariamo il verdetto finale per il nuovo Zelda."
+   - Esempio: "Voglio scrivere una recensione di Call of Duty."
 
-Classifica come 'Review' se:
-- La richiesta chiede un'opinione, un voto o una valutazione dettagliata di un gioco.
-- Esempio: "Prepariamo il verdetto finale e la lista dei pro e contro per il nuovo gioco di Zelda."
-- Esempio: "Voglio scrivere una recensione riguardo il nuovo gioco di assasssin's creed"
-- Esempio: "Recensione di call of duty"
+2. News: L'utente cerca informazioni su eventi, aggiornamenti, patch o annunci relativi al software videoludico.
+   - Esempio: "Quali giochi escono questo mese?"
+   - Esempio: "C'è stata una conferenza EA? Cosa è successo?"
 
-Classifica come 'News' se:
-- L'utente sta cercando informazioni su eventi, aggiornamenti o annunci relativi a videogiochi.
-- Esempio: "Quali sono le novità di questo mese per i videogiochi?"
-- Esempio: "C'è stata una conferenza di EA? Cosa è successo?"
-- Esempio: "Quali sono le ultime notizie sul prossimo Call of Duty?"
-- Esempio: "Quali giochi escono questo mese?"
+3. Suggestion: L'utente è indeciso e chiede idee, brainstorming o suggerimenti generici su argomenti da trattare.
+   - Esempio: "Dammi 5 idee interessanti per lo streaming di domani."
+   - Esempio: "Di quali giochi retro potrei parlare nel prossimo editoriale?"
 
+4. Planning: L'utente richiede la creazione o la gestione di un piano editoriale strutturato nel tempo.
+   - Esempio: "Voglio una pianificazione editoriale di 4 giorni."
+   - Esempio: "Suggeriscimi un piano di possibili post."
 
-Classifica come 'Suggestion' se:
-- L'utente è bloccato su delle scelte, sta facendo brainstorming su argomenti per contenuti futuri o cerca una direzione creativa generale.
-- Esempio: "Quali sono alcuni buoni giochi retro di cui dovrei parlare nel mio prossimo editoriale?"
-- Esempio: "Non so cosa trasmettere in streaming domani, dammi 5 idee interessanti."
-
-Classifica come 'Planning' se:
-- L'utente è bloccato su delle scelte e vuole realizzato un piano editoriale a lungo termine.
-- Esempio: "Che pianificazione potre fare?"
-- Esempio: "Voglio una pianificazione editoriale di 4 giorni"
-- Esempio: "Suggeriscimi una pianificazione di post"
-- Esempio: "Suggeriscimi una pianificazione editoriale di possibili post"
+**Regole di Scarto (Priorità Assoluta - Categoria: Ignore)**
+La categoria "Ignore" ha la precedenza assoluta su tutte le altre. Usala immediatamente se la richiesta:
+- Riguarda hardware, console, PC, monitor, mouse, tastiere, o componenti fisici da gaming.
+- Riguarda film, serie TV, libri, tecnologia generale, cibo o moda.
+- Non è chiaramente e direttamente correlata a news, recensioni o pianificazioni di software videoludico.
 """
 
 triage_user_prompt = """
-Per favore, determina come classificare la seguente richiesta del proprietario del blog:
+Determina come classificare la seguente richiesta del proprietario del blog:
 Richiesta: {user_query}
 """

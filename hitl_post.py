@@ -34,7 +34,6 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
                 "allow_respond": True,  # Mantiene sotto il box di testo per scrivere modifiche
                 "allow_edit": True,    # Permette di modificare il testo prima di approvare
             },
-            #"description": f"### Bozza della Recensione/News corrente:\n\n{proposta}",
             "description": descrizione_ui,
 
         }
@@ -50,7 +49,6 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
             return Command(goto=END)
         
         elif tipo_risposta == "edit":
-            dati_ricevuti = response.get("args", {})
             testo_modificato = response["args"]["args"]["bozza"]            
             messaggio_edit = (
                 "*Il testo è stato corretto manualmente nell'editor:*\n\n"
@@ -98,7 +96,6 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
             return Command(goto=END)
         
         elif tipo_risposta == "edit":
-            dati_ricevuti = response.get("args", {})
             testo_modificato = response["args"]["args"]["suggerimento"]
             return Command(
                 goto="triage_unit",

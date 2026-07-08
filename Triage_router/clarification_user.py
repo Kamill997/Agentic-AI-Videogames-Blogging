@@ -1,12 +1,11 @@
 import json
 from langgraph.graph import END
-from State_template import TriageState, ClarifyWithUser, ResearchQuestion
-from prompts.prompt_chiarificazione_richiesta_utente import clarify_news_instructions,clarify_review_instructions,transform_messages_into_research_topic_prompt
+from State_template import TriageState, ClarifyWithUser, ResearchQuestion,DuplicateEvaluation,llm_p
+from prompts.prompt_chiarificazione_richiesta_utente import clarify_news_instructions,clarify_review_instructions,conflict_detection_prompt,transform_messages_into_research_topic_prompt
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, get_buffer_string
 from langgraph.types import Command
 from typing import Literal
 from langgraph.types import interrupt, Command
-from State_template import llm_p    
 from tools.neo4j_tool import check_game_already_reviewed_tool,check_news_already_published_tool
 
 def clarify_and_write_brief(state: TriageState) -> Command[Literal["clarify_and_write_brief", END]]:
@@ -50,45 +49,50 @@ def clarify_and_write_brief(state: TriageState) -> Command[Literal["clarify_and_
         tool_result = check_news_already_published_tool.invoke({"argomento": response_brief.game_name})
     
     if tool_result.get("is_duplicate") == True:
-        
         records = tool_result.get("data", [])
         segnalazioni_match = []
         
         for i, doc in enumerate(records, 1):
             titolo_doc = doc.get("titolo", "Titolo non disponibile")
             overview_doc = doc.get("overview", "Nessun abstract o riassunto presente")
-
             blocco = (
-                f"Match #{i}: {titolo_doc}**\n"
-                f"> *Abstract/Overview:* {overview_doc}\n"
+                f"Match #{i}: {titolo_doc}\n"
+                f"> Abstract/Overview: {overview_doc}\n"
                 f"---"
             )
             segnalazioni_match.append(blocco)
             
         messaggio_match = "\n".join(segnalazioni_match)
     
-        request = {
-            "action_request": {
-                "action": "Verifica Duplicati", 
-                "args": {
-                    "risultato_database": tool_result 
-                }
-            },
-            "config": {
-                "allow_accept": True, 
-                "allow_ignore": True
-            },
-            "description": (
-                f"**ATTENZIONE: {tool_result['message'].upper()}**\n\n"
-                f"Il sistema ha rilevato i seguenti contenuti simili già presenti nel database:\n\n"
-                f"{messaggio_match}\n\n"
-                f"Vuoi procedere comunque con la creazione del nuovo post o preferisci annullare?"
-            ),
-        }
+        eval_model = llm_p.with_structured_output(DuplicateEvaluation)
+        eval_result = eval_model.invoke([HumanMessage(content=conflict_detection_prompt.format(game_name=response_brief.game_name, research_brief=response_brief.research_brief, messaggio_match=messaggio_match))])
+                
+        if eval_result.is_real_duplicate:
             
-        risposta = interrupt([request])[0] 
-        
-        if risposta.get("type") == "ignore":
-            return Command(goto=END, update={"classification_decision": "Ignore"})
-        
+            request = {
+                "action_request": {
+                    "action": "Verifica Duplicati", 
+                    "args": {
+                        "risultato_database": tool_result,
+                        "ragionamento_llm": eval_result.reasoning
+                    }
+                },
+                "config": {
+                    "allow_accept": True, 
+                    "allow_ignore": True
+                },
+                "description": (
+                    f"**ATTENZIONE: DUPLICATO CONFERMATO DALL'IA**\n\n"
+                    f"Il sistema ha rilevato contenuti simili e l'AI ritiene che sia un vero duplicato per questo motivo:\n"
+                    f"> *{eval_result.reasoning}*\n\n"
+                    f"**Articoli analizzati:**\n{messaggio_match}\n\n"
+                    f"Vuoi procedere forzatamente con la creazione del post o preferisci annullare?"
+                ),
+            }
+                
+            risposta = interrupt([request])[0] 
+            
+            if risposta.get("type") == "ignore":
+                return Command(goto=END, update={"classification_decision": "Ignore"})
+                
     return Command(goto=END, update={"query": response_brief.research_brief})
