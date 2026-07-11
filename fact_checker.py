@@ -1,4 +1,4 @@
-import json
+import ast
 from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 from State_template import AgentState, llm_p,FactCheckResult
 
@@ -13,7 +13,7 @@ def fact_check_node(state: AgentState):
         if isinstance(msg, ToolMessage):
             if msg.name == "tavily_search_tool":
                 try:
-                    data = json.loads(msg.content)
+                    data = ast.literal_eval(msg.content)
                     for r in data.get("results", []):
                         raw_facts.append(r.get("content", ""))
                 except Exception:
@@ -49,7 +49,6 @@ def fact_check_node(state: AgentState):
         SystemMessage(content=system_prompt),
         HumanMessage(content=system_prompt.format(contesto_fonti=contesto_fonti,bozza_da_controllare=bozza,richiesta_utente=query))
     ])
-    print(f"conflitto rilevato: {risultato_check.has_conflicts }, discrepanza: {risultato_check.discrepancies}")
 
     warning = ""
     if risultato_check.has_conflicts == "si":

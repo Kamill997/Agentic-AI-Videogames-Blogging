@@ -22,7 +22,7 @@ def crea_db_RAG(file_path):
     documenti_finali = []
     
     for sezione in sezioni:
-        titolo_gioco = sezione.metadata.get("gioco", "Recensione")
+        titolo_gioco = sezione.metadata.get("gioco", "Info")
         nome_sezione = sezione.metadata.get("sezione", "Info")
         
         titolo_sezione = f"{titolo_gioco} - {nome_sezione}"

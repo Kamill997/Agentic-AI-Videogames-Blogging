@@ -1,7 +1,7 @@
 from datetime import datetime
 from urllib.parse import urlparse
 from typing import List
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from neo4j_connection import neo4j_driver
 from State_template import AgentState, llm_p, InfoPostReview, InfoPostNews
 from prompts.prompt_estrattore_info_neo4j import estrazione_features_review,estrazione_features_News
@@ -26,16 +26,23 @@ def create_post_node_in_neo4j(state: AgentState):
     link_sorgente = elabora_link_sorgente(raw_links)
 
     with neo4j_driver.session() as session:
-        if topic == "Review":
-            llm_estrattore = llm_p.with_structured_output(InfoPostReview)
-            extracted_data = llm_estrattore.invoke([HumanMessage(content=estrazione_features_review.format(content=content))])
-            post_id = create_review_post(session, extracted_data, content, data_odierna, link_sorgente)
-        
-        else:  
-            llm_estrattore = llm_p.with_structured_output(InfoPostNews)
-            extracted_data = llm_estrattore.invoke([HumanMessage(content=estrazione_features_News.format(content=content))])
-            post_id = create_news_post(session, extracted_data, content, data_odierna, link_sorgente)
-    return {"neo4j_post_id": post_id}
+        try:
+            if topic == "Review":
+                llm_estrattore = llm_p.with_structured_output(InfoPostReview)
+                extracted_data = llm_estrattore.invoke([HumanMessage(content=estrazione_features_review.format(content=content))])
+                post_id = create_review_post(session, extracted_data, content, data_odierna, link_sorgente)
+            
+            else:  
+                llm_estrattore = llm_p.with_structured_output(InfoPostNews)
+                extracted_data = llm_estrattore.invoke([HumanMessage(content=estrazione_features_News.format(content=content))])
+                post_id = create_news_post(session, extracted_data, content, data_odierna, link_sorgente)
+
+            esito = f"Post di tipo '{topic}' creato con successo su Neo4j. ID: {post_id}"
+            
+        except Exception as e:
+            esito = f"Errore critico durante la creazione del post su Neo4j: {str(e)}"
+
+    return {"messages": [AIMessage(content=esito)]}
 
 
 def create_review_post(session, post_data: InfoPostReview, content: str, data_post: str, links: List[dict]):

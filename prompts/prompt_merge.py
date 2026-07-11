@@ -1,16 +1,15 @@
 summarize_webpage_gameReview = """
 Sei un editor videoludico incaricato di trasformare il contenuto grezzo di una pagina web in una recensione professionale IN ITALIANO.
+IGNORA TUTTO QUELLO CHE NON È IL CONTENUTO DELLA PAGINA WEB, IGNORA FOTO, LOGHI, PUBBLICITÀ, COMMENTI, SEZIONI NON RILEVANTI, ECC.
 
 DATI DELLA RICERCA (Web, RAG e Tool):
-<webpage_content>
 {webpage_content}
-</webpage_content>
 
-RICHIESTE ESPLICITE DELL'UTENTE:
+RICHIESTE ESPLICITE DELL'UTENTE DA TENERE IN CONSIDERAZIONE:
 {richiesta}
 
 DATA ATTUALE
-{data}]
+{data}
 
 OBIETTIVO:
 Scrivi una recensione completa, scorrevole e informativa, eliminando completamente elementi non rilevanti della pagina web 
@@ -67,9 +66,7 @@ Sei incaricato di realizzare una news editoriale a tema videoludico partendo dai
 Il tuo obiettivo è creare una news che preservi tutte le informazioni essenziali.
 
 Ecco il contenuto grezzo della pagina:
-<webpage_content>
 {webpage_content}
-</webpage_content>
 
 DEVI TENERE IN CONSIDERAZIONI EVENTUALI RICHIESTE ESPLICITE DELL'UTENTE:
 {richiesta}

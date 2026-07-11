@@ -25,6 +25,7 @@ def trova_id_gioco(gioco_richiesto: str)-> tuple:
     try:
         nome_pulito_base = clean_title(gioco_richiesto)
         url_ricerca = f"https://store.steampowered.com/api/storesearch/?term={nome_pulito_base}&l=italian&cc=IT"
+
         risultato = requests.get(url_ricerca, timeout=6).json()
         items = risultato.get("items", [])
         
@@ -136,8 +137,10 @@ def ottieni_prezzo_gioco(game_name: str,ragionamento:str) -> str:
     
     try:
         res = requests.get(url_prezzo, timeout=6).json()
+
         if not res or not res.get(str(id_gioco), {}).get("success"):
             return json.dumps({"stato": "errore", "dettaglio": f"Impossibile recuperare il prezzo per '{titolo_gioco}'"}, ensure_ascii=False)
+        
         data = res[str(id_gioco)]["data"]
 
         is_free = data.get("is_free", False)
@@ -149,6 +152,7 @@ def ottieni_prezzo_gioco(game_name: str,ragionamento:str) -> str:
                 "prezzo_originale": "0,00€",
                 "sconto_percentuale": 0
             }
+            
         else:
             price_overview = data.get("price_overview")
             if not price_overview:

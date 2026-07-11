@@ -15,8 +15,8 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
     """
     proposta = state.get("merge_result")
     decision = state.get("classification_decision")
+    warning_rag = state.get("fact_check_warning") 
 
-    warning_rag = state.get("fact_check_warning") # Recuperiamo il warning
     descrizione_ui = f"### Revisione della proposta generata:\n\n{proposta}"
     if warning_rag:
         descrizione_ui = f"### {warning_rag}\n\n---\n\n" + descrizione_ui
@@ -30,20 +30,19 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
             },
             "config": {
                 "allow_accept": True,   # Crea il tasto "Mark as Resolved" (Approva)
-                "allow_ignore": True,   # Crea il tasto "Ignore" (Rifiuta/Annulla)
+                "allow_ignore": True,   # Crea il tasto "ignore" (Rifiuta/Annulla)
                 "allow_respond": True,  # Mantiene sotto il box di testo per scrivere modifiche
-                "allow_edit": True,    # Permette di modificare il testo prima di approvare
+                "allow_edit": True,    # Permette di modficare il testo prima di approvare
             },
             "description": descrizione_ui,
-
         }
+
         response = interrupt([request])[0]
         tipo_risposta = response["type"]
 
         if tipo_risposta == "accept" :
             print(response)
             return Command(goto="create_post_node_in_neo4j", update={"merge_result": proposta})
-
         
         elif tipo_risposta == "ignore":
             return Command(goto=END)
@@ -54,23 +53,13 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
                 "*Il testo è stato corretto manualmente nell'editor:*\n\n"
                 f"{testo_modificato}"
             )
-            return Command(
-                goto="create_post_node_in_neo4j",
-                update={
-                    "merge_result": testo_modificato,
-                    "messages": [AIMessage(content=messaggio_edit)]
-                }
-            )
+            return Command(goto="create_post_node_in_neo4j", update={ "merge_result": testo_modificato,"messages": [AIMessage(content=messaggio_edit)]})
+        
         elif tipo_risposta == "response":
             feedback_utente = response.get("args", "")
             messaggio_response = f"**Richiesta dell'utente:**\n> {feedback_utente}"
-            return Command(
-                goto="refine_proposal",
-                update={
-                    "user_feedback": feedback_utente,
-                    "messages": [HumanMessage(content=messaggio_response)] 
-                }
-            )
+            return Command(goto="refine_proposal",update={"user_feedback": feedback_utente,"messages": [HumanMessage(content=messaggio_response)] })
+        
         else:
             raise ValueError(f"Azione UI non riconosciuta: {tipo_risposta}")
     
@@ -85,7 +74,7 @@ def hitl_post(state: AgentState) -> Command[Literal["refine_proposal","create_po
                 "allow_ignore": True,   # Crea il tasto "Ignore" (Rifiuta/Annulla)
                 "allow_edit": True,    # Permette di modificare il testo prima di approvare
             },
-                "description": f"### Suggerimento pubblicazione post:\n\n{proposta}",
+                "description": f"Suggerimento pubblicazione post:\n\n{proposta}",
         }
         response = interrupt([request])[0]
         tipo_risposta = response["type"]
@@ -106,6 +95,7 @@ def refine_proposal(state: AgentState) -> Command[Literal["hitl_post"]]:
     
     richiesta_utente = state.get("user_feedback", "")
     bozza_da_modificare = state.get("merge_result")  
+    
     system_prompt = prompt_rifinitura.format(bozza_attuale=bozza_da_modificare, feedback_utente=richiesta_utente)
     rielaborazione= llm.invoke([HumanMessage(content=system_prompt)] )
 
@@ -115,6 +105,7 @@ def refine_proposal(state: AgentState) -> Command[Literal["hitl_post"]]:
         " Ho applicato le modifiche richieste. Ecco la nuova versione della recensione:\n\n"
         f"{bozza_rielaborata}"
     )
+    
     return Command(
         goto="hitl_post",
         update={

@@ -115,7 +115,7 @@ def check_game_already_reviewed_tool(game_name: str) -> dict:
     """
     query = """
     MATCH (p:Post {tipo_post: 'Review'})
-    WHERE toLower(p.title) CONTAINS toLower($game_name)
+    WHERE toLower(p.titolo) CONTAINS toLower($game_name)
        OR EXISTS {
            MATCH (p)-[:ABOUT]->(g:Game)
            WHERE toLower(g.nome) = toLower($game_name)
@@ -147,7 +147,7 @@ def check_game_already_reviewed_tool(game_name: str) -> dict:
 def check_news_already_published_tool(argomento: str) -> dict:
     """
     Usa questo tool prima di finalizzare una notizia.
-    Verifica se esistono già news pubblicate nel database su un determinato argomento o gioco.
+    Verifica se esistono già news pubblicate nel database su un determinato evento/gioco/notizia.
     Ritorna i match trovati con titolo e overview.
     """
     query = """

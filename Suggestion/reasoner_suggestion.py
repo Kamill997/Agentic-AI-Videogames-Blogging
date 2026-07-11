@@ -18,14 +18,13 @@ def reasoning_suggestion_node(state: StateSuggestion):
     Gestisce autonomamente il loop di ricerca e bilanciamento storico.
     """
     messages = state.get("suggestion_messages", [])
-
     data_di_oggi = datetime.now().strftime("%d %B %Y") 
+
     prompt = research_agent_prompt_suggestion.format(data=data_di_oggi, richiesta=state.get("query", ""))
     invoke_messages = [SystemMessage(content=prompt)] + messages
     response = llm_with_tools.invoke(invoke_messages)
-    update = {
-        "suggestion_messages": [response]
-    }
+    
+    update = {"suggestion_messages": [response]}
 
     if not (hasattr(response, "tool_calls") and response.tool_calls):
         match = re.search(r"<FINAL_QUERY>(.*?)</FINAL_QUERY>", response.content, re.IGNORECASE)

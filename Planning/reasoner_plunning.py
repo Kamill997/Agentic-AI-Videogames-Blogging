@@ -17,10 +17,13 @@ llm_with_tools = llm_x.bind_tools(tools,parallel_tool_calls=False)
 def planner_node(state: PlanningState) ->Command[Literal["research_node","hitl_planning_node","executor_node",END]]:
 
     richiesta=state.get("query")    
+
     active_plan = check_active_plan_tool.invoke({})
+
     prompt = prompt_planner.format(query=richiesta,active_plan=active_plan)
     model = llm_x.with_structured_output(PlanningCommand)
     decision = model.invoke(prompt)
+    
     state_updates = {
         "active_plan": active_plan,
         "next_action": decision.action,

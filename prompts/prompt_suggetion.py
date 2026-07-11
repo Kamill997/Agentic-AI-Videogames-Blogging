@@ -34,7 +34,7 @@ Esegui ricerche mirate in base al formato scelto. Non incrociare mai le due tipo
  ***SE HAI SCELTO NEWS:
   - lancia query ampie sull'attualità del momento (es. "ultime notizie videogiochi", "annunci videogiochi Maggio", "breaking news videogames").
   - DEVI ASSOLUTAMENTE VERIFICARE LA DATA DELLA NEWS E DELLE INFORMAZIONI RIPORTATE FACENDO UNA RICERCA SU INTERNET , SE LA NEWS è VECCHIA SCARTALA E CERCA ANCORA, la data di oggi è {data}.
-  - Verifica tramite `check_news_already_published_tool` se la notizia è già sul blog. NON ti fidare dell'output del tool ma esamina sempre il risultato e determina tu.
+  - Verifica tramite `check_news_already_published_tool` se la notizia che vuoi suggerie (non la ricerca che hai effettuato per trovare l'informazione) è già sul blog. NON ti fidare dell'output del tool ma esamina sempre il risultato e determina tu.
 
  ***SE HAI SCELTO RECENSIONE:
  NON SCARTARE UN GIOCO SOLO PERCHè è UN GIOCO STORICO SUPER GETTONATO, L'IMPORTANTE È CHE NON SIA STATO RECENSITO NEL NOSTRO BLOG, NON MI INTERESSA SE SU INTERNET è MOLTO RECENSITO
