@@ -4,31 +4,31 @@ Agentic AI for Video Game Blogging
 [![Built with LangGraph](https://img.shields.io/badge/Built%20with-LangGraph-blue.svg)](https://python.langchain.com/docs/langgraph)
 [![Database Neo4j](https://img.shields.io/badge/GraphDB-Neo4j-008cc1.svg)](https://neo4j.com/)
 
-è un sistema di Intelligenza Artificiale basato su architettura ad agenti (Agentic AI) progettato per gestire, automatizzare l'esecuzione editoriale di un blog di videogiochi. 
+Agentic AI for Video Game Blogging è un sistema di Intelligenza Artificiale basato su un'architettura ad agenti (Agentic AI) progettato per supportare un autore nella gestione e nell'automazione del processo editoriale di un blog dedicato al mondo dei videogiochi.
 
 ---
 
 ## Funzionalità Principali
 
-Il sistema è composto da un Agent specializzato a coprire l'intero ciclo di vita di un articolo:
+Il sistema è composto da un agente specializzato in grado di assistere l'autore del blog nelle diverse fasi del processo editoriale, dalla ricerca delle informazioni fino alla pianificazione dei contenuti a lungo termine.
 
 * **News:** Ricerca delle ultime notizie nel mondo del gaming tramite *Tavily*, filtraggio delle fonti e stesura di articoli aggiornati.
 * **Review Generation:** Creazione di recensioni approfondite estrapolando dati di gioco, statistiche e sentiment degli utenti tramite l'integrazione di *Steam Tool*.
 * **Recommendation & Suggestion:** Sistema di suggerimento per un possibile articolo da scrivere nel caso in cui non si sappia se scrivere una nuova News/Review, il tutto basato su un Knowledge Graph gestito con *Neo4j*.
-* **Content Planning:** Pianificazione editoriale intelligente degli articoli.
+* **Content Planning:** Pianificazione editoriale intelligente degli articoli per n giorni (1 post a giorno).
 
 ---
 
 ## Architettura:
 
-*   **Orchestrazione:** [LangGraph](https://python.langchain.com/docs/langgraph) per la gestione dei workflow complessi, dello stato degli agenti e della logica ciclica.
-*   **LLM Provider:** [Groq](https://groq.com/) come motore principale per garantire che utilizza i migliori modelli open-source (llama e openAI GPT).
+*   **Orchestrazione:** [LangGraph](https://python.langchain.com/docs/langgraph) per la gestione e la visione del flusso esecutivo dell'agente.
+*   **LLM Provider:** [Groq](https://groq.com/) servizio che mette a disposizione vari modelli di Large Language Model (llama e openAI GPT).
 *   **Pattern di Ragionamento:** **ReAct (Reasoning and Acting)**. Gli agenti non si limitano a generare testo, ma *pensano* a quale azione intraprendere, *usano* gli strumenti a disposizione e *reagiscono* ai risultati ottenuti.
-*   **Supervisione (HITL):** Implementazione **Human-in-the-Loop** che sospende il grafo (interrupt) per permettere all'editor umano di approvare, rifiutare o modificare una bozza di articolo prima della pubblicazione finale.
+*   **Supervisione (HITL):** Implementazione **Human-in-the-Loop** che sospende il grafo (interrupt) per permettere all'umano di approvare, rifiutare o modificare una bozza di un articolo proposto (o di un suggerimento editorilae) prima della pubblicazione finale.
 
 ## Strumenti Integrati (Tools)
 
-*   **Tavily Search (via MCP):** Integrato tramite il *Model Context Protocol* per dotare l'agente di una ricerca web semantica e in tempo reale, fondamentale per recuperare news affidabili.
+*   **Tavily Search (via MCP):** Integrato tramite il *Model Context Protocol* per dotare l'agente di un motore di ricerca web semantica e in tempo reale, fondamentale per recuperare informazioni da internet.
 *   **Steam Tool:** Utilizzato per estrarre informazioni sui giochi, recensioni della community, prezzi e dettagli direttamente dal catalogo di Steam.
 *   **Rag Tool:** Utilizzato per il recupero delle informazioni affidabili all'interno del Database Chroma.
 *   **Neo4j:** Database a grafo per la costruzione e l'interrogazione del Knowledge Graph sui videogiochi.
@@ -39,13 +39,13 @@ Il sistema è composto da un Agent specializzato a coprire l'intero ciclo di vit
 ## Installazione e Avvio
 
 * Python 3.14
-* Le chiavi API dei servizi esterni (vedi .env).
-* Creazione Database tramite Neo4j Desktop (si potrebbe utilizzare anche la versione AuraDB, ma per la seguente si è optato per l'opzione locale)
+* Le chiavi API dei servizi esterni (da inserire nel file .env).
+* Creazione Database tramite Neo4j Desktop (si potrebbe utilizzare anche la versione AuraDB, ma per il progetto si è optato per l'opzione in locale)
 
 1. Dipendenze
 
-All'interno della cartella del progetto è presente un file "requirments.txt". All'interno di ciò sono presenti tutte le dipendenze necessarie da installare per il corretto funzionamento dell'Agent.
-Questo è possibile, tramite riga di comando, lanciando:
+All'interno della cartella del progetto è presente un file "requirments.txt". All'interno del file sono presenti tutte le dipendenze necessarie da installare per il corretto funzionamento dell'Agent.
+Per l'installazione è necessario eseguire la seguente riga di comando:
 pip install -r requirments.txt
 
 2. Variabili d'ambiente
@@ -60,7 +60,7 @@ NEO4J_URI=neo4j://127.0.0.1:7687
 NEO4J_USERNAME=neo4j
 NEO4J_PASSWORD="inserire Password del DB"
 
-N.B. Per quanto riguarda Groq e i suoi modelli è possibile che la chiave gratuita che viene generata non sia sufficiente per via del quantitativo di Token in input, per questo è consigliato un piano "Pay-As-You-Go", cosi da pagare solamente per l'effettivo utilizzo delle chiamate effettuate ed eliminare questo limite.
+N.B. Per quanto riguarda Groq e i modelli disponibili gratuitamente, è possibile che la chiave API gratuita non sia sufficiente a gestire richieste conmplesse come il planning in quanto fanno uso di un numero elevato di tokek. Per questo motivo, si consiglia di utilizzare il piano Pay-As-You-Go, che consente di pagare esclusivamente in base all'effettivo utilizzo delle API, eliminando le limitazioni legate al piano gratuito.
 
 3. Inizializzazione dei dati
 
@@ -68,11 +68,11 @@ Per quanto riguarda il RAG, sono presenti delle informazioni di partenza contenu
 Per fare ciò eseguiamo:
 python RAG\crea_db_chroma.py
 
-4. Esecuzione dell'Agent e Fine Tuning
+4. Esecuzione dell'Agent
 Da terminale è necessario lanciare il comando:
 langgraph dev
 
-Prima di passare all'esecuzione vera e propria è necessario configurare Langsmith studio e Agent Inbox.
+Prima di passare all'esecuzione vera e propria è necessario configurare Langsmith studio e Agent Inbox per poter interagire correttamente con l'agente.
 
 #Fine Tuning
 Per quanto riguarda il Fine Tuning, a causa della poca potenza computazionale e problemi relativi ai Dataset e al relativo recupero su Huggin Face, si è deciso di utilizzare la Piattaforma Kaggle.
@@ -83,4 +83,4 @@ Autori
 Progetto realizzato per il corso di Cognitive Computing & Artificial Intelligence (A.A. 2025-2026).
 
 Luca Camio — Matricola: 
-Gioele Messina — Matricola:
+Gioele Messina — Matricola:1000002040
