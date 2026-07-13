@@ -6,7 +6,6 @@ import subprocess
 import sys
 import time
 import concurrent.futures
-
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_core.tools import tool
 
@@ -130,12 +129,10 @@ async def _run_mcp_search(query: str, ragionamento: str) -> str:
     client = _get_mcp_client()
     mcp_tools = await client.get_tools()
     
-    # 1. FIX: Usa il nome corretto esposto dal server MCP
     search_tool = next((t for t in mcp_tools if t.name == "tavily_search_tool"), None)
     if search_tool is None:
         return "Il server MCP non espone il tool 'tavily_search_tool'."
         
-    # 2. FIX: Invia entrambi i parametri richiesti dal server
     result = await search_tool.ainvoke({"query": query, "ragionamento": ragionamento})
     text = _extract_text(result).strip()
     return text if text else "Il server MCP non ha restituito alcun testo."
