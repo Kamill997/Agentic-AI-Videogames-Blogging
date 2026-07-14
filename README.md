@@ -89,7 +89,7 @@ langgraph dev
 
 ## Fine Tuning
 
-A causa della limitata potenza computazionale e di problematiche relative ai dataset e al loro recupero su Hugging Face, si è deciso di utilizzare la piattaforma **Kaggle**. La procedura da seguire è la seguente:
+A causa della limitata potenza computazionale , si è deciso di utilizzare la piattaforma **Kaggle** per usufruire della potenza di calcolo messa a disposizione della piattaforma stessa. La procedura da seguire è la seguente:
 
 1. Andare su **File** → **Import Notebook** e importare il notebook del progetto.
 2. Dopo il corretto import, andare su **Accelerator** e selezionare la GPU **T4 x2**.
