@@ -83,4 +83,5 @@ Autori
 Progetto realizzato per il corso di Cognitive Computing & Artificial Intelligence (A.A. 2025-2026).
 
 Luca Camio — Matricola: 
+
 Gioele Messina — Matricola:1000002040
