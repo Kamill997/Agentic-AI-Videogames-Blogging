@@ -1,107 +1,225 @@
 # Agentic AI for Video Game Blogging
 
-**Agentic AI for Video Game Blogging** è un sistema di Intelligenza Artificiale basato su un'architettura ad agenti (Agentic AI) progettato per supportare un autore nella gestione e nell'automazione del processo editoriale di un blog dedicato al mondo dei videogiochi.
+Assistente editoriale **agentico** per un blog di videogiochi, costruito con **LangGraph**. Il sistema accompagna l'autore lungo tutto il ciclo di produzione dei contenuti: propone argomenti, pianifica il calendario editoriale, ricerca le informazioni (web, Steam, database locale) e scrive le bozze di **news** e **recensioni**. Ogni operazione importante passa da una **validazione umana** (Human-in-the-Loop) prima di essere salvata nel Knowledge Graph.
+
+Progetto per il corso di **Cognitive Computing & Artificial Intelligence** (A.A. 2025/2026). I dettagli di progetto e le scelte implementative sono nella relazione [`Relazione/Relazione.pdf`](Relazione/Relazione.pdf).
 
 ---
 
-## Funzionalità Principali
+## Funzionalità
 
-Il sistema è composto da un agente specializzato in grado di assistere l'autore del blog nelle diverse fasi del processo editoriale, dalla ricerca delle informazioni fino alla pianificazione dei contenuti a lungo termine.
-
-- **News:** Ricerca delle ultime notizie nel mondo del gaming tramite Tavily, filtraggio delle fonti e stesura di articoli aggiornati.
-- **Review Generation:** Creazione di recensioni approfondite estrapolando dati di gioco, statistiche e sentiment degli utenti tramite l'integrazione di Steam Tool.
-- **Recommendation & Suggestion:** Sistema di suggerimento per un possibile articolo da scrivere nel caso in cui non si sappia se scrivere una nuova News/Review, il tutto basato su un Knowledge Graph gestito con Neo4j.
-- **Content Planning:** Pianificazione editoriale intelligente degli articoli per n giorni (1 post a giorno).
+| Funzione | Descrizione |
+|---|---|
+| **News** | Ricerca delle ultime notizie con Tavily, filtro delle fonti e stesura dell'articolo. |
+| **Review** | Recensioni complete che uniscono dati dal web, dal database locale (RAG), recensioni degli utenti e prezzi da Steam. |
+| **Suggestion** | Propone un nuovo articolo quando l'autore non sa cosa scrivere, analizzando lo storico dei post nel Knowledge Graph. |
+| **Planning** | Piano editoriale per *n* giorni (1 post al giorno), salvato in coda su Neo4j e consumato un post alla volta. |
+| **Fact checking** | Confronta la bozza con le fonti grezze e segnala dati inventati o non supportati. |
+| **Rilevamento duplicati** | Prima di scrivere controlla su Neo4j se il gioco è già stato recensito o la news già pubblicata. |
+| **Fine-tuning** | Classificatore di sentiment (*Positivo / Negativo / Misto*) per le recensioni degli utenti, addestrato su Kaggle. |
 
 ---
 
 ## Architettura
 
-- **Orchestrazione:** LangGraph per la gestione e la visione del flusso esecutivo dell'agente.
-- **LLM Provider:** Groq, servizio che mette a disposizione vari modelli di Large Language Model (Llama e OpenAI GPT).
-- **Pattern di Ragionamento:** ReAct (Reasoning and Acting). Gli agenti non si limitano a generare testo, ma pensano a quale azione intraprendere, usano gli strumenti a disposizione e reagiscono ai risultati ottenuti.
-- **Supervisione (HITL):** Implementazione Human-in-the-Loop che sospende il grafo (interrupt) per permettere all'umano di approvare, rifiutare o modificare una bozza di un articolo proposto (o di un suggerimento editoriale) prima della pubblicazione finale.
+```mermaid
+flowchart TD
+    A([Richiesta utente]) --> T[triage_unit<br/>classificazione + chiarimenti]
+    T --> R{router_after_triage}
+    R -->|News / Review| L[llm_call<br/>ReAct]
+    L <-->|tool call| TL[tools]
+    L --> M[merge_result]
+    M --> F[fact_check_node]
+    F --> H{{hitl_post<br/>approva / modifica / rifiuta / feedback}}
+    H -->|feedback| RF[refine_proposal] --> H
+    H -->|approvato| N[(create_post_node_in_neo4j)]
+    R -->|Suggestion| S[suggestion_subgraph] --> H
+    H -->|suggerimento accettato| T
+    R -->|Planning| P[planning_subgraph]
+    P -->|prossimo post in coda| T
+    R -->|Ignore| E([Fine])
+```
+
+### Componenti principali
+
+- **Orchestrazione:** [LangGraph](https://langchain-ai.github.io/langgraph/). Il grafo principale è in `workflow.py`; triage, suggerimento e pianificazione sono **sottografi** con stato indipendente, così la cronologia dei messaggi non si accumula e non confonde il modello.
+- **Pattern di ragionamento:** **ReAct** (*Reasoning and Acting*): l'agente decide quale strumento usare, lo esegue e reagisce al risultato.
+- **LLM:** servizio [Groq](https://groq.com/), con modelli diversi a seconda del compito (configurati in `State_template.py`).
+
+  | Modello | Uso |
+  |---|---|
+  | `llama-3.3-70b-versatile` | Ragionamento ReAct, chiarimenti, brief, fact checking |
+  | `llama-3.1-8b-instant` | Triage e rifinitura della bozza |
+  | `openai/gpt-oss-120b` | Pianificazione editoriale e stesura finale (merge) |
+
+- **Human-in-the-Loop:** il grafo si sospende con `interrupt` e l'autore può **approvare**, **modificare**, **rifiutare** o **rispondere con un feedback** a cui l'agente reagisce con una nuova versione.
+
+### Sottografi
+
+| Sottografo | Cartella | Ruolo |
+|---|---|---|
+| **Triage + chiarimento** | `Triage_router/` | Classifica la richiesta (`Review`, `News`, `Suggestion`, `Planning`, `Ignore`), pone eventuali domande all'utente, scrive il *research brief* e controlla i duplicati. |
+| **Suggestion** | `Suggestion/` | Ragiona sullo storico dei post per proporre il prossimo articolo. |
+| **Planning** | `Planning/` | Crea, mostra, elimina o avanza il piano editoriale (azioni `DO_RESEARCH`, `POP_NEXT`, `DELETE_EXISTING`, `INTERACTION`, `SHOW_MESSAGE`). |
 
 ---
 
-## Strumenti Integrati (Tools)
+## Strumenti (Tools)
 
-- **Tavily Search (via MCP):** Integrato tramite il Model Context Protocol per dotare l'agente di un motore di ricerca web semantica e in tempo reale, fondamentale per recuperare informazioni da internet.
-- **Steam Tool:** Utilizzato per estrarre informazioni sui giochi, recensioni della community, prezzi e dettagli direttamente dal catalogo di Steam.
-- **RAG Tool:** Utilizzato per il recupero delle informazioni affidabili all'interno del Database Chroma.
-- **Neo4j:** Database a grafo per la costruzione e l'interrogazione del Knowledge Graph sui videogiochi.
-- **Fine-Tuning:** Utilizzato per catalogare in un sistema multiclasse le recensioni dei videogiocatori in base a "Positivo", "Negativo", "Misto".
+| Tool | File | Descrizione |
+|---|---|---|
+| **Tavily Search (via MCP)** | `tools/tavily_search_tool.py`, `mcp_server/search_server.py` | Ricerca web in tempo reale esposta tramite **Model Context Protocol**. Il server MCP (`127.0.0.1:8765`) viene avviato in automatico come sottoprocesso. |
+| **Steam** | `tools/steam_tool.py` | Risolve il nome del gioco in AppID e recupera recensioni degli utenti e prezzo. |
+| **RAG** | `tools/RAG_tool.py` | Recupero semantico da **ChromaDB** (embedding `intfloat/multilingual-e5-base`) con soglia di pertinenza. |
+| **Neo4j** | `tools/neo4j_tool.py` | Interroga il Knowledge Graph: controllo duplicati, giochi non ancora recensiti, contesto per la pianificazione, post esistenti su un gioco. |
 
 ---
 
-## Installazione e Avvio
+## Knowledge Graph (Neo4j)
+
+I post approvati vengono salvati dal nodo `create_post_node_in_neo4j` (`add_node.py`), che estrae con un LLM titolo, giochi, case editrici, generi e riassunto.
+
+| Nodo | Descrizione |
+|---|---|
+| `Post` | Articolo pubblicato (news o recensione) con titolo, contenuto, data e overview |
+| `Game` | Videogioco, anche solo menzionato (con flag `uscito`) |
+| `Publisher` | Casa editrice / software house |
+| `Genere` | Genere del gioco |
+| `Source` | Dominio delle fonti usate |
+| `Pianificazione` | Post in coda del piano editoriale (`stato: PENDING`) |
+
+Relazioni principali: `(Post)-[:ABOUT]->(Game)`, `(Post)-[:MENTIONS]->(Game)`, `(Post)-[:PUBLISHED_BY]->(Publisher)`, `(Game)-[:HAS_GENERE]->(Genere)`, `(Post)-[:SOURCED_FROM]->(Source)`.
+
+---
+
+## RAG
+
+I documenti di partenza sono in `RAG/recensioni.md`, un file Markdown con una sezione per gioco (trama, gameplay, analisi critica, ecc.). Lo script `RAG/crea_db_chroma.py` li divide per intestazione, li suddivide in *chunk* (400 parole, 50 di sovrapposizione, con il titolo di sezione anteposto) e li salva in ChromaDB nella cartella `chroma_db/`.
+
+---
+
+## Fine-tuning del classificatore di sentiment
+
+Notebook: [`FineTuning/FineTuning.ipynb`](FineTuning/FineTuning.ipynb), da eseguire su **Kaggle**. Il task classifica una recensione in `negative`, `mixed` o `positive`, usando il dataset [`auphong2707/game-reviews-sentiment`](https://huggingface.co/datasets/auphong2707/game-reviews-sentiment) (recensioni sotto le 100 parole scartate, classi bilanciate: 8.400 esempi di train, 1.800 di validation e 1.800 di test).
+
+Sono stati confrontati diversi approcci, con ricerca degli iperparametri e un *composite score* che penalizza l'overfitting:
+
+| Modello | Tecnica | Accuracy | F1-macro |
+|---|---|---|---|
+| RoBERTa-large-MNLI | Zero-shot | 0,631 | 0,636 |
+| **M1**: DistilBERT (Wenfi, IMDB) | **LoRA** | 0,732 | 0,730 |
+| **M2**: DistilBERT | Full fine-tuning | 0,723 | 0,723 |
+| BERT-base-uncased | Full fine-tuning | 0,745 | 0,746 |
+
+Con LoRA si aggiornano circa 740 mila parametri (1,09% dei 67 milioni del full fine-tuning) e si ottengono risultati in linea con gli approcci più pesanti. Il notebook include anche uno stress test su esempi scritti a mano (sarcasmo, recensioni brevi, ecc.) e un'analisi **XAI** con *Integrated Gradients*.
+
+> Il dataset è in inglese e la classe `mixed` resta la più difficile da riconoscere per tutti i modelli. Dettagli e limiti sono nel capitolo 9 della relazione.
+
+---
+
+## Struttura della repository
+
+```
+Agentic-AI-Videogames-Blogging/
+├── workflow.py                  # Grafo principale (entry point di LangGraph)
+├── State_template.py            # Stati, schemi Pydantic e configurazione degli LLM
+├── langgraph.json               # Configurazione per `langgraph dev`
+├── reasoner.py                  # Nodo ReAct (llm_call) e routing dei tool
+├── route_after_triage.py        # Smistamento dopo il triage
+├── merge_result.py              # Unione dei risultati dei tool e stesura della bozza
+├── fact_checker.py              # Verifica della bozza rispetto alle fonti
+├── hitl_post.py                 # Human-in-the-Loop e rifinitura della bozza
+├── add_node.py                  # Salvataggio dei post in Neo4j
+├── neo4j_connection.py          # Connessione al database
+├── Triage_router/               # Sottografo di triage e chiarimento
+├── Suggestion/                  # Sottografo dei suggerimenti editoriali
+├── Planning/                    # Sottografo di pianificazione editoriale
+├── tools/                       # Tavily, Steam, RAG, Neo4j
+├── mcp_server/                  # Server MCP per la ricerca web
+├── RAG/                         # Dati di partenza e script di creazione del DB vettoriale
+├── prompts/                     # Prompt di sistema dei vari nodi
+├── FineTuning/                  # Notebook di fine-tuning (Kaggle)
+├── Relazione/                   # Relazione del progetto (PDF)
+├── chroma_db/                   # Database vettoriale generato
+└── requirements.txt
+```
+
+---
+
+## Installazione
 
 ### Prerequisiti
 
-- Python 3.14
-- Chiavi API dei servizi esterni (da inserire nel file `.env`)
-- Creazione del Database tramite Neo4j Desktop (in alternativa è possibile utilizzare la versione AuraDB, ma per questo progetto si è optato per l'installazione in locale)
+- **Python 3.11** o superiore (versione configurata in `langgraph.json`)
+- Chiavi API per [Groq](https://console.groq.com/), [Tavily](https://tavily.com/) e [LangSmith](https://smith.langchain.com/)
+- Un database **Neo4j** in locale tramite [Neo4j Desktop](https://neo4j.com/download/) (in alternativa AuraDB)
 
 ### Dipendenze
-
-All'interno della cartella del progetto è presente un file `requirements.txt` contenente tutte le dipendenze necessarie per il corretto funzionamento dell'agente. Per installarle, eseguire:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Variabili d'Ambiente
+### Variabili d'ambiente
 
-All'interno del file `.env` sarà necessario sostituire i campi designati con le proprie chiavi e password personali:
+Compilare il file `.env` nella root con le proprie chiavi:
 
 ```env
-GROQ_API_KEY="Inserire API"
-TAVILY_API_KEY="Inserire Tavily API"
+GROQ_API_KEY="<la_tua_chiave>"
+TAVILY_API_KEY="<la_tua_chiave>"
 LANGCHAIN_TRACING_V2="true"
-LANGSMITH_API_KEY="Inserire API LangSmith"
+LANGSMITH_API_KEY="<la_tua_chiave>"
 LANGCHAIN_PROJECT="progetto cognitive"
 NEO4J_URI=neo4j://127.0.0.1:7687
 NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD="Inserire Password del DB"
+NEO4J_PASSWORD="<password_del_db>"
+NEO4J_DATABASE=<nome_db>
 ```
 
-> **N.B.** Per quanto riguarda Groq e i modelli disponibili gratuitamente, è possibile che la chiave API gratuita non sia sufficiente a gestire richieste complesse come il planning, in quanto fanno uso di un numero elevato di token. Per questo motivo, si consiglia di utilizzare il piano **Pay-As-You-Go**, che consente di pagare esclusivamente in base all'effettivo utilizzo delle API, eliminando le limitazioni legate al piano gratuito.
+> ⚠️ Il file `.env` è escluso da `.gitignore`: non committare mai chiavi reali.
 
-### Inizializzazione dei Dati
+> **N.B.** Con il piano gratuito di Groq le richieste più pesanti, come la pianificazione, possono superare i limiti di token. Si consiglia il piano **Pay-As-You-Go**, che fa pagare solo l'utilizzo effettivo.
 
-Per quanto riguarda il RAG, sono presenti delle informazioni di partenza contenute all'interno del file `recensioni.md`, che verranno utilizzate per popolare il database. Per eseguire l'inizializzazione:
+### Inizializzazione del database vettoriale
 
 ```bash
 python RAG/crea_db_chroma.py
 ```
 
-### Esecuzione dell'Agente
+---
 
-Da terminale, lanciare il seguente comando:
+## Esecuzione
+
+Con il database Neo4j attivo, dalla root del progetto:
 
 ```bash
 langgraph dev
 ```
 
-> Prima di avviare l'esecuzione vera e propria, è necessario configurare **LangSmith Studio** e **Agent Inbox** per poter interagire correttamente con l'agente.
+Il comando avvia il server locale di LangGraph e apre **LangSmith Studio**, da cui si interagisce con l'agente. Per gestire le interruzioni di Human-in-the-Loop (approva, modifica, rifiuta, feedback) va configurato anche **Agent Inbox**.
+
+Esempi di richieste:
+
+- *"Scrivi una recensione di Far Cry 3"* → ricerca, bozza, fact check, revisione umana e salvataggio nel grafo
+- *"Ci sono novità su GTA VI?"* → news aggiornata con fonti
+- *"Non so cosa scrivere, mi dai un'idea?"* → suggerimento basato sullo storico
+- *"Crea un piano editoriale per 3 giorni"* → piano salvato in coda e primo post avviato
 
 ---
 
-## Fine Tuning
+## Fine-tuning su Kaggle
 
-A causa della limitata potenza computazionale , si è deciso di utilizzare la piattaforma **Kaggle** per usufruire della potenza di calcolo messa a disposizione della piattaforma stessa. La procedura da seguire è la seguente:
+Il fine-tuning richiede una GPU, perciò è stato svolto su [Kaggle](https://www.kaggle.com/):
 
-1. Andare su **File** → **Import Notebook** e importare il notebook del progetto.
-2. Dopo il corretto import, andare su **Settings** → **Accelerator** e selezionare la GPU **T4 x2**.
-3. Avviare l'esecuzione delle celle.
+1. **File** → **Import Notebook** e importare `FineTuning/FineTuning.ipynb`.
+2. **Settings** → **Accelerator** e selezionare la GPU **T4 x2**.
+3. Eseguire le celle.
 
 ---
 
 ## Autori
 
-Progetto realizzato per il corso di **Cognitive Computing & Artificial Intelligence** (A.A. 2025-2026).
-
-| Nome | Matricola |
-|------|-----------|
-| Luca Camiolo | 1000084790 |
-| Gioele Messina | 1000002040 |
+| Nome |
+|---|
+| Luca Camiolo |
+| Gioele Messina |
