@@ -176,8 +176,6 @@ NEO4J_PASSWORD="<password_del_db>"
 NEO4J_DATABASE=<nome_db>
 ```
 
-> ⚠️ Il file `.env` è escluso da `.gitignore`: non committare mai chiavi reali.
-
 > **N.B.** Con il piano gratuito di Groq le richieste più pesanti, come la pianificazione, possono superare i limiti di token. Si consiglia il piano **Pay-As-You-Go**, che fa pagare solo l'utilizzo effettivo.
 
 ### Inizializzazione del database vettoriale
